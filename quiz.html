@@ -181,6 +181,16 @@ body{background:linear-gradient(135deg,var(--primary),var(--secondary));min-heig
     <button class="btn btn-primary" onclick="showSection('lecons')">📚 Voir les leçons</button>
     <button class="btn btn-success" onclick="showSection('niveaux')">🎮 Jouer maintenant</button>
   </div>
+  <div style="margin-top:14px;padding-top:14px;border-top:1px solid #e2e8f0">
+    <p style="font-size:.8em;color:#718096;margin-bottom:10px">💾 Sauvegarde — pour retrouver ta progression sur un autre appareil</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" onclick="exportSave()" style="flex:1;background:#f0fff4;color:#276749;font-size:.9em">⬇️ Exporter ma sauvegarde</button>
+      <label class="btn" style="flex:1;background:#f0f4ff;color:var(--primary);font-size:.9em;cursor:pointer;text-align:center">
+        ⬆️ Importer une sauvegarde
+        <input type="file" accept=".json" onchange="importSave(event)" style="display:none">
+      </label>
+    </div>
+  </div>
 </div>
 
 <!-- LEÇONS -->
@@ -1108,6 +1118,44 @@ function startNextLevel(){
 }
 function quitGame(){
   if(confirm("Quitter ? Ta progression dans ce niveau sera perdue."))showSection("niveaux");
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EXPORT / IMPORT SAUVEGARDE
+// ═══════════════════════════════════════════════════════════════════
+function exportSave(){
+  const players=getPlayers();
+  if(Object.keys(players).length===0){showToast("Aucune sauvegarde à exporter.");return;}
+  const data=JSON.stringify(players,null,2);
+  const blob=new Blob([data],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  const date=new Date().toISOString().slice(0,10);
+  a.download="english-master-sauvegarde-"+date+".json";
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast("Sauvegarde téléchargée !");
+}
+function importSave(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=JSON.parse(e.target.result);
+      if(typeof data==="object"&&data!==null){
+        savePlayers(data);
+        updatePlayerDisplay();
+        renderLevels();
+        const names=Object.keys(data);
+        if(names.length>0)switchPlayer(names[0]);
+        showToast("Sauvegarde importée ! Bienvenue "+names[0]+" !");
+      } else {showToast("Fichier invalide.");}
+    } catch(err){showToast("Erreur : fichier non reconnu.");}
+  };
+  reader.readAsText(file);
+  event.target.value="";
 }
 
 // ═══════════════════════════════════════════════════════════════════

@@ -85,6 +85,13 @@ h1{text-align:center;color:var(--primary);font-size:2.1em;margin-bottom:4px}
   <button class="btn btn-primary" onclick="window.location.href='quiz.html'">↩ Retour au Quiz</button>
   <button class="btn btn-link" onclick="window.open('lexique.html','_blank')">📖 Lexique</button>
 </div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px" class="no-print">
+  <button class="btn" onclick="exportSave()" style="flex:1;background:#f0fff4;color:#276749;font-size:.85em">⬇️ Exporter ma sauvegarde</button>
+  <label class="btn" style="flex:1;background:#f0f4ff;color:#667eea;font-size:.85em;cursor:pointer;text-align:center">
+    ⬆️ Importer une sauvegarde
+    <input type="file" accept=".json" onchange="importSave(event)" style="display:none">
+  </label>
+</div>
 
 <div class="nav-tabs">
   <button class="tab-btn active" onclick="showTab('stats',this)">📈 Statistiques</button>
@@ -189,6 +196,35 @@ let currentPlayerData = null;
 let currentPlayerName = null;
 let camIdx = 0;
 let camHelped = 0;
+
+function exportSave(){
+  const players=getPlayers();
+  if(Object.keys(players).length===0){alert("Aucune sauvegarde à exporter.");return;}
+  const blob=new Blob([JSON.stringify(players,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="english-master-sauvegarde-"+new Date().toISOString().slice(0,10)+".json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function importSave(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=JSON.parse(e.target.result);
+      if(typeof data==="object"&&data!==null){
+        savePlayers(data);
+        loadPlayerList();
+        alert("Sauvegarde importée !");
+      } else alert("Fichier invalide.");
+    } catch(err){alert("Erreur : fichier non reconnu.");}
+  };
+  reader.readAsText(file);
+  event.target.value="";
+}
 
 function getPlayers(){try{return JSON.parse(localStorage.getItem(PLAYERS_KEY))||{};}catch(e){return {};}}
 function savePlayers(p){localStorage.setItem(PLAYERS_KEY,JSON.stringify(p));}

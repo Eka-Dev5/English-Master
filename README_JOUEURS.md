@@ -154,8 +154,32 @@ Tout est sauvegardé dans le navigateur, sans compte, sans mot de passe :
 - Les badges débloqués
 - Le nombre de fois où Lucas a été aidé
 
-**La sauvegarde reste sur cet ordinateur, dans ce navigateur.**
-Si on change de navigateur ou d'ordinateur, la progression recommence à zéro.
+**La sauvegarde reste sur cet appareil, dans ce navigateur.**
+Si on change de navigateur ou d'appareil, la progression n'est pas retrouvée automatiquement — il faut l'exporter puis l'importer.
+
+---
+
+## 💾 Transférer sa progression sur un autre appareil
+
+La progression peut voyager d'un appareil à l'autre en deux étapes.
+
+### Exporter (sauvegarder avant de partir)
+
+1. Aller sur la page d'accueil du quiz
+2. Appuyer sur **⬇️ Exporter ma sauvegarde**
+3. Un fichier `english-master-sauvegarde-DATE.json` se télécharge
+4. L'envoyer par mail, WhatsApp, ou le déposer sur iCloud / Google Drive
+
+### Importer (retrouver sa progression)
+
+1. Récupérer le fichier de sauvegarde (depuis le mail, le Drive…)
+2. Aller sur la page d'accueil du quiz
+3. Appuyer sur **⬆️ Importer une sauvegarde**
+4. Choisir le fichier → la progression est restaurée immédiatement
+
+Les boutons sont aussi disponibles dans l'espace personnel (dashboard).
+
+> **Conseil pour les parents :** encouragez votre enfant à exporter sa sauvegarde après chaque session de jeu, comme on range ses affaires après avoir joué. Ça prend 5 secondes et ça évite de tout perdre.
 
 ---
 
