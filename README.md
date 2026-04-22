@@ -1,28 +1,28 @@
-# English-Master
-Quiz Game Anglais CM2 
+# 🎓 English Master — Quiz Game Anglais CM2
 
-pour acceder au jeu rendez vous a cette adresse : 
+Quiz interactif pour apprendre l’anglais, conçu pour les élèves de CM2.
+10 niveaux de grammaire, 400 questions, 30 badges à débloquer.
 
-https://eka-dev5.github.io/English-Master/quiz.html
+## 🔗 Accès au jeu
 
+👉 **https://eka-dev5.github.io/English-Master/**
 
--------------------
-le dossier du programme contient egalement 
+-----
 
-- Un fichier "Quiz" permettant de lancer le jeu
- 
+## 📂 Contenu du dépôt
 
-- 2 fichiers d'informations :  
+|Fichier            |Rôle                                                |
+|-------------------|----------------------------------------------------|
+|`index.html`       |Page d’accueil — point d’entrée du site             |
+|`quiz.html`        |Le jeu (10 niveaux, QCM + réponses écrites)         |
+|`dashboard.html`   |Espace personnel : stats, badges, fiches de révision|
+|`lexique.html`     |Dictionnaire interactif (125 mots, niveaux 1 à 10)  |
+|`README_JOUEURS.md`|Mode d’emploi destiné aux joueurs                   |
+|`README_DEV.md`    |Documentation technique du code                     |
 
+-----
 
-README.JOUEURS : contient les regles du jeu d'anglais.
+## 📖 Documentation
 
-README.DEV : contient les donnees informatives sur le code.
-
-Selon votre statut, ouvrez le fichier qui vous interresse.
-
-
-
---------------
-
-les 2 autres fichiers : dashboard.html et lexique.html sont des fichiers transverses du quiz qui n'ont pas d'utilite a etre ouvert par les joueurs.
+- **Vous êtes joueur ou parent →** consultez [`README_JOUEURS.md`](README_JOUEURS.md)
+- **Vous êtes développeur →** consultez [`README_DEV.md`](README_DEV.md)
