@@ -1,12 +1,1131 @@
-{
-  "always_run_in_app" : false,
-  "icon" : {
-    "color" : "deep-purple",
-    "glyph" : "magic"
-  },
-  "name" : "quiz.html",
-  "script" : "<!DOCTYPE html>\n\n<html lang=\"fr\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>English Master — Mon Espace<\/title>\n<style>\n:root{--primary:#667eea;--secondary:#764ba2;--success:#48bb78;--error:#f56565;--warning:#ed8936;--gold:#ffd700}\n*{box-sizing:border-box;margin:0;padding:0;font-family:\"Segoe UI\",system-ui,sans-serif}\nbody{background:linear-gradient(135deg,var(--primary),var(--secondary));min-height:100vh;padding:15px}\n.container{max-width:1000px;margin:0 auto;background:white;border-radius:20px;padding:25px;box-shadow:0 20px 60px rgba(0,0,0,.3)}\nh1{text-align:center;color:var(--primary);font-size:2.1em;margin-bottom:4px}\n.subtitle{text-align:center;color:#718096;margin-bottom:20px}\n.nav-tabs{display:flex;gap:8px;margin-bottom:22px;border-bottom:2px solid #e2e8f0;padding-bottom:10px;flex-wrap:wrap;align-items:center}\n.tab-btn{padding:10px 18px;border:none;background:#f0f0f0;border-radius:20px;cursor:pointer;font-weight:bold;transition:all .25s;white-space:nowrap;font-size:.9em}\n.tab-btn:hover,.tab-btn.active{background:var(--primary);color:white}\n.tab-content{display:none}\n.tab-content.active{display:block;animation:fadeIn .3s}\n@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}\n\n\/* STATS *\/\n.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:25px}\n.stat-card{background:linear-gradient(145deg,var(–primary),var(–secondary));color:white;padding:20px;border-radius:15px;text-align:center}\n.stat-num{font-size:2.3em;font-weight:800;display:block}\n.stat-label{font-size:.8em;opacity:.9;text-transform:uppercase;letter-spacing:.5px}\n.level-progress{margin-top:20px}\n.level-progress h3{margin-bottom:12px;color:#2d3748}\n.level-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:.9em}\n.level-row-label{width:100px;color:#4a5568;font-weight:600;flex-shrink:0}\n.progress-bar{flex:1;height:14px;background:#e2e8f0;border-radius:7px;overflow:hidden}\n.progress-fill{height:100%;background:linear-gradient(90deg,var(–success),#68d391);border-radius:7px;transition:width .6s}\n.progress-fill.locked{background:#e2e8f0}\n.level-row-pct{width:38px;text-align:right;color:#718096;font-size:.85em}\n\n\/* BADGES *\/\n.badges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:10px}\n.badge{background:#f5f7fa;border:2px solid #e2e8f0;border-radius:14px;padding:14px;text-align:center;opacity:.45;filter:grayscale(1);transition:all .3s}\n.badge.unlocked{opacity:1;filter:none;border-color:var(–gold);background:linear-gradient(145deg,#fff9e6,#fff3cd);box-shadow:0 4px 15px rgba(255,215,0,.25)}\n.badge-icon{font-size:2.4em;margin-bottom:6px;display:block}\n.badge-name{font-weight:bold;font-size:.85em;color:#2d3748;margin-bottom:3px}\n.badge-desc{font-size:.72em;color:#718096}\n\n\/* CAMÉLÉON *\/\n.cam-box{background:#e8f4ff;border-radius:15px;padding:22px}\n.cam-avatar{text-align:center;font-size:4em;margin-bottom:10px}\n.cam-name{text-align:center;font-weight:bold;color:var(–secondary);margin-bottom:14px}\n.cam-bubble{background:white;border:2px dashed var(–error);border-radius:12px;padding:16px;margin-bottom:16px;font-size:1.1em;font-family:monospace;color:#c53030;text-align:center}\n.cam-instruction{font-weight:bold;color:#2d3748;margin-bottom:12px;text-align:center}\n.cam-options{display:grid;gap:10px}\n.cam-btn{padding:13px;border:2px solid #c6d3f7;background:white;border-radius:10px;cursor:pointer;font-size:.95em;text-align:left;transition:all .2s}\n.cam-btn:hover{border-color:var(–primary);background:#f0f4ff}\n.cam-btn.correct{background:#c6f6d5;border-color:var(–success);color:#276749}\n.cam-btn.wrong{background:#fed7d7;border-color:var(–error);color:#c53030}\n.cam-btn:disabled{cursor:not-allowed}\n.cam-score{text-align:center;margin-top:14px;font-weight:bold;color:var(–secondary)}\n.cam-no-errors{text-align:center;color:#718096;padding:30px}\n\n\/* FICHES *\/\n.fiche-card{background:white;border-left:4px solid var(–primary);padding:16px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.07);margin-bottom:12px}\n.fiche-q{font-weight:bold;color:#2d3748;margin-bottom:6px}\n.fiche-wrong{color:var(–error);text-decoration:line-through;font-size:.95em}\n.fiche-correct{color:var(–success);font-weight:bold;font-size:.95em}\n.fiche-expl{color:#718096;font-size:.85em;margin-top:5px;font-style:italic}\n.print-btn{background:var(–primary);color:white;border:none;padding:10px 22px;border-radius:20px;cursor:pointer;font-weight:bold;margin-bottom:16px;display:block}\n\n\/* PLAYER SELECT *\/\n.player-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}\n.player-header select{padding:8px 12px;border:2px solid #e2e8f0;border-radius:10px;font-size:.95em;flex:1;min-width:150px}\n.btn{padding:9px 18px;border:none;border-radius:10px;cursor:pointer;font-weight:bold;font-size:.9em;transition:all .2s}\n.btn-primary{background:linear-gradient(135deg,var(–primary),var(–secondary));color:white}\n.btn-link{background:#f0f4ff;color:var(–primary)}\n\n.no-print-info{background:#f0fff4;border-left:4px solid var(–success);padding:10px 14px;border-radius:0 8px 8px 0;font-size:.85em;color:#276749;margin-bottom:16px}\n@media print{.nav-tabs,.player-header,.print-btn,.no-print{display:none}}\n@media(max-width:600px){.stats-grid{grid-template-columns:repeat(2,1fr)}.badges-grid{grid-template-columns:repeat(3,1fr)}}\n<\/style>\n\n<\/head>\n<body>\n<div class=\"container\">\n<h1>📊 Mon Espace English Master<\/h1>\n<div class=\"subtitle\">Tous tes progrès, badges et révisions en un coup d'œil<\/div>\n\n<div class=\"player-header no-print\">\n  <select id=\"playerSelect\" onchange=\"loadPlayer(this.value)\"><option value=\"\">-- Choisir un joueur --<\/option><\/select>\n  <button class=\"btn btn-primary\" onclick=\"window.location.href='quiz.html'\">↩ Retour au Quiz<\/button>\n  <button class=\"btn btn-link\" onclick=\"window.open('lexique.html','_blank')\">📖 Lexique<\/button>\n<\/div>\n\n<div class=\"nav-tabs\">\n  <button class=\"tab-btn active\" onclick=\"showTab('stats',this)\">📈 Statistiques<\/button>\n  <button class=\"tab-btn\" onclick=\"showTab('badges',this)\">🏅 Badges (<span id=\"badgeCount\">0<\/span>\/30)<\/button>\n  <button class=\"tab-btn\" onclick=\"showTab('cameleon',this)\">🎭 Mode Caméléon<\/button>\n  <button class=\"tab-btn\" onclick=\"showTab('fiches',this)\">📝 Mes Fiches<\/button>\n<\/div>\n\n<!-- STATS -->\n\n<div id=\"stats\" class=\"tab-content active\">\n  <div class=\"stats-grid\">\n    <div class=\"stat-card\"><span class=\"stat-num\" id=\"statLevel\">1<\/span><span class=\"stat-label\">Niveau actuel<\/span><\/div>\n    <div class=\"stat-card\"><span class=\"stat-num\" id=\"statScore\">0<\/span><span class=\"stat-label\">Points totaux<\/span><\/div>\n    <div class=\"stat-card\"><span class=\"stat-num\" id=\"statStreak\">0<\/span><span class=\"stat-label\">Série 🔥<\/span><\/div>\n    <div class=\"stat-card\"><span class=\"stat-num\" id=\"statRate\">0%<\/span><span class=\"stat-label\">Précision<\/span><\/div>\n  <\/div>\n  <div class=\"level-progress\">\n    <h3>📚 Progression par niveau<\/h3>\n    <div id=\"levelBars\"><\/div>\n  <\/div>\n<\/div>\n\n<!-- BADGES -->\n\n<div id=\"badges\" class=\"tab-content\">\n  <div class=\"no-print-info\">Les badges se débloquent automatiquement selon ta progression dans le quiz.<\/div>\n  <div class=\"badges-grid\" id=\"badgesGrid\"><\/div>\n<\/div>\n\n<!-- CAMÉLÉON -->\n\n<div id=\"cameleon\" class=\"tab-content\">\n  <div class=\"cam-box\">\n    <div class=\"cam-avatar\">🦎<\/div>\n    <div class=\"cam-name\">Mode Caméléon — Aide Lucas !<\/div>\n    <div id=\"cameleonContent\"><\/div>\n    <div class=\"cam-score\" id=\"camScore\"><\/div>\n  <\/div>\n<\/div>\n\n<!-- FICHES -->\n\n<div id=\"fiches\" class=\"tab-content\">\n  <button class=\"print-btn no-print\" onclick=\"window.print()\">🖨️ Imprimer mes fiches<\/button>\n  <div id=\"fichesContent\"><\/div>\n<\/div>\n<\/div>\n\n<script>\nconst STORAGE_KEY = \"englishMaster_v4\";\nconst PLAYERS_KEY = \"englishMaster_players\";\n\nconst LEVEL_NAMES = {\n  1:\"Décollage 🚀\",2:\"Routine 📅\",3:\"En ce moment 👁️\",4:\"Questions ❓\",5:\"Retour ⏪\",\n  6:\"Aventurier ⚔️\",7:\"Voyant 🔮\",8:\"Expériences 🏆\",9:\"Pouvoirs 🪄\",10:\"Maîtrise 👑\"\n};\n\nconst BADGES_DEF = [\n  {id:1,icon:\"🚀\",name:\"Premier Pas\",desc:\"Terminer le niveau 1\",check:p=>p.completed&&p.completed.includes(1)},\n  {id:2,icon:\"📅\",name:\"Routinier\",desc:\"Terminer le niveau 2\",check:p=>p.completed&&p.completed.includes(2)},\n  {id:3,icon:\"👁️\",name:\"Observateur\",desc:\"Terminer le niveau 3\",check:p=>p.completed&&p.completed.includes(3)},\n  {id:4,icon:\"❓\",name:\"Questionneur\",desc:\"Terminer le niveau 4\",check:p=>p.completed&&p.completed.includes(4)},\n  {id:5,icon:\"⏪\",name:\"Archiviste\",desc:\"Terminer le niveau 5\",check:p=>p.completed&&p.completed.includes(5)},\n  {id:6,icon:\"⚔️\",name:\"Aventurier\",desc:\"Terminer le niveau 6\",check:p=>p.completed&&p.completed.includes(6)},\n  {id:7,icon:\"🔮\",name:\"Voyant\",desc:\"Terminer le niveau 7\",check:p=>p.completed&&p.completed.includes(7)},\n  {id:8,icon:\"🏆\",name:\"Champion\",desc:\"Terminer le niveau 8\",check:p=>p.completed&&p.completed.includes(8)},\n  {id:9,icon:\"🪄\",name:\"Magicien\",desc:\"Terminer le niveau 9\",check:p=>p.completed&&p.completed.includes(9)},\n  {id:10,icon:\"👑\",name:\"English Master\",desc:\"Terminer le niveau 10\",check:p=>p.completed&&p.completed.includes(10)},\n  {id:11,icon:\"🎯\",name:\"Sniper\",desc:\"Avoir 100% à un niveau\",check:p=>false},\n  {id:12,icon:\"🔥\",name:\"En feu !\",desc:\"Série de 10 bonnes réponses\",check:p=>(p.streak||0)>=10},\n  {id:13,icon:\"⚡\",name:\"Éclair\",desc:\"Série de 20 bonnes réponses\",check:p=>(p.streak||0)>=20},\n  {id:14,icon:\"💎\",name:\"Diamant\",desc:\"Dépasser 500 points\",check:p=>(p.score||0)>=500},\n  {id:15,icon:\"🌟\",name:\"Étoile\",desc:\"Dépasser 1000 points\",check:p=>(p.score||0)>=1000},\n  {id:16,icon:\"🌈\",name:\"Arc-en-ciel\",desc:\"Dépasser 2000 points\",check:p=>(p.score||0)>=2000},\n  {id:17,icon:\"📝\",name:\"Scripteur\",desc:\"Répondre à 50 questions\",check:p=>(p.totalQuestions||0)>=50},\n  {id:18,icon:\"📚\",name:\"Bosseur\",desc:\"Répondre à 100 questions\",check:p=>(p.totalQuestions||0)>=100},\n  {id:19,icon:\"🧠\",name:\"Génie\",desc:\"Répondre à 200 questions\",check:p=>(p.totalQuestions||0)>=200},\n  {id:20,icon:\"✅\",name:\"Précis\",desc:\"80% de bonnes réponses sur 20 questions\",check:p=>p.totalQuestions>=20&&((p.totalCorrect||0)\/p.totalQuestions)>=0.8},\n  {id:21,icon:\"🦅\",name:\"Aigle\",desc:\"90% de bonnes réponses sur 50 questions\",check:p=>p.totalQuestions>=50&&((p.totalCorrect||0)\/p.totalQuestions)>=0.9},\n  {id:22,icon:\"🏅\",name:\"Médaillé\",desc:\"5 niveaux terminés\",check:p=>(p.completed||[]).length>=5},\n  {id:23,icon:\"🎓\",name:\"Diplômé\",desc:\"8 niveaux terminés\",check:p=>(p.completed||[]).length>=8},\n  {id:24,icon:\"🦁\",name:\"Courageux\",desc:\"Rejouer après une erreur\",check:p=>(p.totalQuestions||0)>=2},\n  {id:25,icon:\"🔁\",name:\"Persévérant\",desc:\"Revenir sur ses erreurs\",check:p=>(p.errorHistory||[]).length>0},\n  {id:26,icon:\"🎭\",name:\"Ami de Lucas\",desc:\"Aider Lucas 1 fois\",check:p=>(p.cameleonHelped||0)>=1},\n  {id:27,icon:\"👨‍🏫\",name:\"Professeur\",desc:\"Aider Lucas 5 fois\",check:p=>(p.cameleonHelped||0)>=5},\n  {id:28,icon:\"🧑‍🎓\",name:\"Maître\",desc:\"Aider Lucas 10 fois\",check:p=>(p.cameleonHelped||0)>=10},\n  {id:29,icon:\"🌍\",name:\"Citoyen du monde\",desc:\"Tous les niveaux terminés\",check:p=>(p.completed||[]).length>=10},\n  {id:30,icon:\"🏆\",name:\"Légendaire\",desc:\"2000+ pts + tous niveaux terminés\",check:p=>(p.score||0)>=2000&&(p.completed||[]).length>=10}\n];\n\nconst CAMELEON_EXERCISES = [\n  {error:\"I is a student.\",correct:\"I am a student.\",rule:\"Avec 'I', to be = AM (pas IS).\",options:[\"I am a student.\",\"I is a student.\",\"I are a student.\",\"I be a student.\"]},\n  {error:\"She don't like cats.\",correct:\"She doesn't like cats.\",rule:\"She\/He\/It + doesn't (pas don't).\",options:[\"She don't like cats.\",\"She doesn't like cats.\",\"She not like cats.\",\"She isn't like cats.\"]},\n  {error:\"He play football every day.\",correct:\"He plays football every day.\",rule:\"He\/She\/It + verbe + S au présent simple.\",options:[\"He play football.\",\"He plays football.\",\"He playing football.\",\"He is play football.\"]},\n  {error:\"Look! The cat sleep on the sofa.\",correct:\"Look! The cat is sleeping on the sofa.\",rule:\"Look! = action en cours = BE + -ING.\",options:[\"The cat sleep.\",\"The cat sleeping.\",\"The cat is sleeping.\",\"The cat sleeps.\"]},\n  {error:\"I have 10 years.\",correct:\"I am 10 years old.\",rule:\"L'âge se dit avec TO BE (pas TO HAVE) en anglais !\",options:[\"I have 10 years.\",\"I am 10 years old.\",\"I has 10 years.\",\"I is 10 years.\"]},\n  {error:\"Yesterday I go to school.\",correct:\"Yesterday I went to school.\",rule:\"Yesterday = passé. GO → WENT (irrégulier).\",options:[\"Yesterday I go.\",\"Yesterday I goes.\",\"Yesterday I went.\",\"Yesterday I gone.\"]},\n  {error:\"I can swims.\",correct:\"I can swim.\",rule:\"Après un modal (can\/must\/should), le verbe ne prend PAS de S.\",options:[\"I can swims.\",\"I can swim.\",\"I can swimming.\",\"I can swam.\"]},\n  {error:\"She has never went to Paris.\",correct:\"She has never been to Paris.\",rule:\"Present Perfect de GO = HAVE + BEEN (pas WENT).\",options:[\"She has never went.\",\"She has never been.\",\"She has never go.\",\"She have never been.\"]},\n  {error:\"If I will be you, I would go.\",correct:\"If I were you, I would go.\",rule:\"2ème conditionnel : IF + WERE (pas WILL).\",options:[\"If I will be you.\",\"If I was you.\",\"If I were you.\",\"If I am you.\"]},\n  {error:\"They was at the cinema.\",correct:\"They were at the cinema.\",rule:\"They\/We\/You + WERE (pas WAS) au prétérit.\",options:[\"They was.\",\"They were.\",\"They is.\",\"They are.\"]}\n];\n\nlet currentPlayerData = null;\nlet currentPlayerName = null;\nlet camIdx = 0;\nlet camHelped = 0;\n\nfunction getPlayers(){try{return JSON.parse(localStorage.getItem(PLAYERS_KEY))||{};}catch(e){return {};}}\nfunction savePlayers(p){localStorage.setItem(PLAYERS_KEY,JSON.stringify(p));}\n\nfunction loadPlayerList(){\n  const sel=document.getElementById(\"playerSelect\");\n  const players=getPlayers();\n  sel.innerHTML=\"<option value=''>-- Choisir un joueur --<\/option>\";\n  Object.keys(players).forEach(n=>{\n    const o=document.createElement(\"option\"); o.value=n;\n    o.textContent=n+\" (Niv.\"+players[n].currentLevel+\")\";\n    sel.appendChild(o);\n  });\n  const names=Object.keys(players);\n  if(names.length>0){sel.value=names[0];loadPlayer(names[0]);}\n}\n\nfunction loadPlayer(name){\n  if(!name){currentPlayerData=null;return;}\n  const players=getPlayers();\n  currentPlayerData=players[name]||null;\n  currentPlayerName=name;\n  if(currentPlayerData){renderAll();}\n}\n\nfunction showTab(id,btn){\n  document.querySelectorAll(\".tab-content\").forEach(t=>t.classList.remove(\"active\"));\n  document.querySelectorAll(\".tab-btn\").forEach(b=>b.classList.remove(\"active\"));\n  document.getElementById(id).classList.add(\"active\");\n  if(btn)btn.classList.add(\"active\");\n  if(id===\"cameleon\")renderCameleon();\n  if(id===\"fiches\")renderFiches();\n}\n\nfunction renderAll(){\n  if(!currentPlayerData)return;\n  const p=currentPlayerData;\n  document.getElementById(\"statLevel\").textContent=p.currentLevel||1;\n  document.getElementById(\"statScore\").textContent=p.score||0;\n  document.getElementById(\"statStreak\").textContent=p.streak||0;\n  const rate=p.totalQuestions>0?Math.round((p.totalCorrect||0)\/p.totalQuestions*100):0;\n  document.getElementById(\"statRate\").textContent=rate+\"%\";\n  renderLevelBars();\n  renderBadges();\n}\n\nfunction renderLevelBars(){\n  const p=currentPlayerData;\n  const completed=p.completed||[];\n  const current=p.currentLevel||1;\n  let h=\"\";\n  for(let i=1;i<=10;i++){\n    const done=completed.includes(i);\n    const isCur=i===current&&!done;\n    const locked=i>current&&!done;\n    let pct=done?100:isCur?50:0;\n    h+=`<div class=\"level-row\">\n      <span class=\"level-row-label\">Niv. ${i}<\/span>\n      <div class=\"progress-bar\"><div class=\"progress-fill${locked?\" locked\":\"\"}\" style=\"width:${pct}%\"><\/div><\/div>\n      <span class=\"level-row-pct\">${done?\"✅\":isCur?\"▶\":locked?\"🔒\":\"—\"}<\/span>\n    <\/div>`;\n  }\n  document.getElementById(\"levelBars\").innerHTML=h;\n}\n\nfunction renderBadges(){\n  const p=currentPlayerData;\n  let unlocked=0;\n  const h=BADGES_DEF.map(b=>{\n    const ok=b.check(p);\n    if(ok)unlocked++;\n    return `<div class=\"badge${ok?\" unlocked\":\"\"}\">\n      <span class=\"badge-icon\">${b.icon}<\/span>\n      <div class=\"badge-name\">${b.name}<\/div>\n      <div class=\"badge-desc\">${b.desc}<\/div>\n    <\/div>`;\n  }).join(\"\");\n  document.getElementById(\"badgesGrid\").innerHTML=h;\n  document.getElementById(\"badgeCount\").textContent=unlocked;\n}\n\nfunction renderCameleon(){\n  const p=currentPlayerData;\n  const ex=CAMELEON_EXERCISES[camIdx%CAMELEON_EXERCISES.length];\n  const helped=p?p.cameleonHelped||0:0;\n  const c=document.getElementById(\"cameleonContent\");\n  c.innerHTML=`\n    <div class=\"cam-bubble\">❌ Lucas dit : \"${ex.error}\"<\/div>\n    <div class=\"cam-instruction\">Quelle est la phrase correcte ?<\/div>\n    <div class=\"cam-options\">\n      ${ex.options.map((opt,i)=>`<button class=\"cam-btn\" id=\"camBtn${i}\" onclick=\"checkCameleon(${i},'${opt.replace(\/'\/g,\"\\'\")}','${ex.correct.replace(\/'\/g,\"\\'\")}')\">${opt}<\/button>`).join(\"\")}\n    <\/div>\n    <div style=\"margin-top:12px;font-size:.85em;color:#718096\">Lucas aide aidé ${helped} fois ✅<\/div>`;\n  document.getElementById(\"camScore\").textContent=\"\";\n}\n\nfunction checkCameleon(idx,chosen,correct){\n  const isOk=chosen===correct;\n  document.querySelectorAll(\".cam-btn\").forEach(b=>b.disabled=true);\n  document.getElementById(\"camBtn\"+idx).classList.add(isOk?\"correct\":\"wrong\");\n  if(!isOk){\n    const opts=document.querySelectorAll(\".cam-btn\");\n    opts.forEach(b=>{if(b.textContent===correct)b.classList.add(\"correct\");});\n  }\n  const ex=CAMELEON_EXERCISES[camIdx%CAMELEON_EXERCISES.length];\n  document.getElementById(\"camScore\").innerHTML=`\n    ${isOk?\"✅ Bravo ! Tu as aidé Lucas !\":\"❌ Pas tout à fait… Retiens bien :\"}<br>\n    <em>${ex.rule}<\/em>\n    <br><br><button class=\"btn btn-primary\" onclick=\"nextCameleon()\" style=\"margin-top:8px\">Exercice suivant →<\/button>`;\n  if(isOk&&currentPlayerName){\n    const players=getPlayers();\n    const pp=players[currentPlayerName];\n    if(pp){pp.cameleonHelped=(pp.cameleonHelped||0)+1;savePlayers(players);currentPlayerData=pp;}\n  }\n}\n\nfunction nextCameleon(){\n  camIdx++;\n  renderCameleon();\n}\n\nfunction renderFiches(){\n  const p=currentPlayerData;\n  const errors=p&&p.errorHistory?p.errorHistory.slice(-20).reverse():[];\n  const c=document.getElementById(\"fichesContent\");\n  if(errors.length===0){\n    c.innerHTML=\"<div class='cam-no-errors'>🎉 Aucune erreur enregistrée ! Continue comme ça !<\/div>\";return;\n  }\n  const unique=[...new Map(errors.map(e=>[e.question,e])).values()];\n  c.innerHTML=`<p style=\"color:#718096;margin-bottom:14px\">${unique.length} erreurs à réviser :<\/p>`+\n    unique.map(e=>`<div class=\"fiche-card\">\n      <div class=\"fiche-q\">❓ ${e.question}<\/div>\n      <div class=\"fiche-wrong\">✗ Ta réponse : ${e.userAnswer||\"—\"}<\/div>\n      <div class=\"fiche-correct\">✓ Bonne réponse : ${e.correctAnswer}<\/div>\n      ${e.explanation?`<div class=\"fiche-expl\">💡 ${e.explanation}<\/div>`:\"\"}\n    <\/div>`).join(\"\");\n}\n\ndocument.addEventListener(\"DOMContentLoaded\",()=>{loadPlayerList();});\n<\/script>\n\n<\/body>\n<\/html>",
-  "share_sheet_inputs" : [
-
-  ]
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Master 🎓</title>
+<style>
+/* ═══════════════════════════════════════════
+   SUJET CONFIG : changer ici pour adapter à une autre matière
+   Ex: Maths Master, Histoire Master, etc.
+   ═══════════════════════════════════════════ */
+:root {
+  --primary:#667eea; --secondary:#764ba2; --success:#48bb78;
+  --error:#f56565; --warning:#ed8936; --bg:#f7fafc; --text:#2d3748;
+  --shadow:0 10px 30px rgba(0,0,0,0.15);
 }
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",system-ui,sans-serif}
+body{background:linear-gradient(135deg,var(--primary),var(--secondary));min-height:100vh;padding:15px}
+
+.quiz-container{background:white;width:100%;max-width:820px;margin:0 auto;border-radius:20px;padding:25px;box-shadow:var(--shadow)}
+
+/* HEADER */
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:15px;border-bottom:2px solid #e2e8f0;flex-wrap:wrap;gap:10px}
+.player-info{display:flex;align-items:center;gap:10px}
+.player-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));color:white;display:flex;align-items:center;justify-content:center;font-size:1.2em;font-weight:bold}
+.player-name{font-weight:bold;font-size:1.1em;color:var(--text)}
+.player-stats{font-size:0.8em;color:#718096}
+.header-score{background:linear-gradient(135deg,var(--primary),var(--secondary));color:white;padding:8px 18px;border-radius:20px;font-weight:bold;font-size:1em}
+.player-selector{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.player-selector select{padding:8px 12px;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;font-size:0.95em;flex:1;min-width:120px}
+.player-selector select:focus{outline:none;border-color:var(--primary)}
+.btn{padding:9px 18px;border:none;border-radius:10px;cursor:pointer;font-weight:bold;font-size:0.9em;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:white}
+.btn-primary:hover{opacity:.88;transform:translateY(-1px)}
+.btn-danger{background:#fed7d7;color:#c53030}
+.btn-danger:hover{background:#feb2b2}
+.btn-success{background:#c6f6d5;color:#276749}
+.btn-success:hover{background:#9ae6b4}
+
+/* SECTIONS */
+.section{display:none}
+.section.active{display:block}
+
+/* ACCUEIL */
+.home-title{text-align:center;font-size:2.2em;font-weight:800;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.home-sub{text-align:center;color:#718096;margin-bottom:25px}
+.home-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:15px;margin:20px 0}
+.home-stat{background:linear-gradient(145deg,#f0f4ff,#e8ecff);padding:18px;border-radius:15px;text-align:center}
+.home-stat-num{font-size:2em;font-weight:bold;color:var(--primary)}
+.home-stat-label{font-size:.8em;color:#718096;text-transform:uppercase;letter-spacing:.5px}
+.home-btns{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
+.home-btns .btn{flex:1;padding:14px;font-size:1em;border-radius:12px}
+
+/* LEÇONS */
+.lessons-list{display:grid;gap:12px}
+.lesson-card{background:#f8fafc;border:2px solid #e2e8f0;border-radius:14px;padding:18px;cursor:pointer;transition:all .25s}
+.lesson-card:hover{border-color:var(--primary);background:#f0f4ff}
+.lesson-card.open{border-color:var(--primary);background:#f0f4ff}
+.lesson-header{display:flex;justify-content:space-between;align-items:center}
+.lesson-title{font-weight:bold;font-size:1.05em;color:var(--text)}
+.lesson-tag{background:var(--primary);color:white;padding:3px 10px;border-radius:12px;font-size:.75em}
+.lesson-body{display:none;margin-top:14px;padding-top:14px;border-top:1px solid #e2e8f0}
+.lesson-body.open{display:block}
+.lesson-rule{background:white;border-left:4px solid var(--primary);padding:12px 16px;border-radius:0 10px 10px 0;margin-bottom:10px}
+.lesson-rule h4{color:var(--secondary);margin-bottom:6px;font-size:.95em;text-transform:uppercase;letter-spacing:.5px}
+.lesson-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:.9em}
+.lesson-table td,.lesson-table th{padding:7px 10px;border:1px solid #e2e8f0;text-align:left}
+.lesson-table th{background:var(--primary);color:white;font-weight:600}
+.lesson-table tr:nth-child(even){background:#f8fafc}
+.lesson-warning{background:#fff5d6;border-left:4px solid var(--warning);padding:10px 14px;border-radius:0 8px 8px 0;margin:8px 0;font-size:.9em}
+.lesson-example{background:#e6ffed;border-left:4px solid var(--success);padding:10px 14px;border-radius:0 8px 8px 0;margin:4px 0;font-size:.9em;font-style:italic}
+
+/* NIVEAUX */
+.levels-container{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:15px}
+.level-card{border:2px solid #e2e8f0;border-radius:14px;padding:18px;transition:all .25s}
+.level-card:not(.locked){cursor:pointer}
+.level-card:not(.locked):hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:var(--shadow)}
+.level-card.locked{opacity:.55;background:#f8fafc}
+.level-card.completed{border-color:var(--success);background:#f0fff4}
+.level-card.current{border-color:var(--primary);background:#f0f4ff}
+.level-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.level-number{font-size:.8em;font-weight:bold;color:#718096;text-transform:uppercase;letter-spacing:.5px}
+.level-title{font-size:1.1em;font-weight:bold;color:var(--text);margin-bottom:4px}
+.level-obj{font-size:.85em;color:#718096}
+.mode-selector{background:#f8fafc;border-radius:14px;padding:18px;margin-bottom:18px}
+.mode-title{font-weight:bold;margin-bottom:12px;color:var(--text)}
+.mode-btns{display:flex;gap:10px;flex-wrap:wrap}
+.mode-btn{flex:1;padding:11px;border:2px solid #e2e8f0;background:white;border-radius:10px;cursor:pointer;font-weight:bold;transition:all .2s;text-align:center;min-width:100px}
+.mode-btn.selected,.mode-btn:hover{border-color:var(--primary);background:var(--primary);color:white}
+
+/* JEU */
+.question-box{background:#f8fafc;border-radius:14px;padding:22px;margin-bottom:16px}
+.question-num{font-size:.85em;color:#718096;margin-bottom:8px;font-weight:600}
+.question-text{font-size:1.25em;font-weight:bold;color:var(--text);line-height:1.5}
+.options-grid{display:grid;gap:10px;margin-top:16px}
+.option-btn{padding:13px 18px;border:2px solid #e2e8f0;background:white;border-radius:10px;cursor:pointer;text-align:left;font-size:1em;transition:all .2s}
+.option-btn:hover:not(:disabled){border-color:var(--primary);background:#f0f4ff}
+.option-btn.selected{border-color:var(--primary);background:#f0f4ff}
+.option-btn.correct{border-color:var(--success) !important;background:#c6f6d5 !important;color:#276749 !important}
+.option-btn.wrong{border-color:var(--error) !important;background:#fed7d7 !important;color:#c53030 !important}
+.option-btn:disabled{cursor:not-allowed}
+.answer-input{width:100%;padding:14px 16px;border:2px solid #e2e8f0;border-radius:10px;font-size:1.1em;margin-top:12px;transition:border-color .2s}
+.answer-input:focus{outline:none;border-color:var(--primary)}
+.answer-input.correct{border-color:var(--success);background:#f0fff4}
+.answer-input.wrong{border-color:var(--error);background:#fff5f5}
+.feedback{border-radius:12px;padding:16px 18px;margin-top:14px;display:none}
+.feedback.show{display:block;animation:fadeIn .3s}
+.feedback.correct-fb{background:#c6f6d5;border-left:4px solid var(--success)}
+.feedback.wrong-fb{background:#fed7d7;border-left:4px solid var(--error)}
+.feedback-title{font-weight:bold;font-size:1.1em;margin-bottom:5px}
+.feedback-explanation{font-size:.9em;color:#4a5568;margin-top:5px}
+.progress-wrap{margin-bottom:16px}
+.progress-bar{height:10px;background:#e2e8f0;border-radius:5px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--secondary));transition:width .4s;border-radius:5px}
+.game-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.game-actions .btn{flex:1}
+
+/* RÉSULTATS */
+.results-box{text-align:center;padding:20px}
+.result-score-circle{width:130px;height:130px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:var(--shadow)}
+.result-score-num{font-size:2.5em;font-weight:800}
+.result-score-sub{font-size:.8em;opacity:.9}
+.result-msg{font-size:1.1em;color:var(--text);margin-bottom:20px}
+.result-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.result-btns .btn{padding:12px 24px}
+
+/* TOAST */
+.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%) translateY(20px);background:#2d3748;color:white;padding:12px 22px;border-radius:30px;font-weight:bold;opacity:0;transition:all .3s;z-index:999;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){
+  .home-title{font-size:1.7em}
+  .player-selector{flex-direction:column;align-items:stretch}
+  .player-selector select{width:100%}
+  .levels-container{grid-template-columns:1fr}
+  .home-btns .btn{font-size:.9em}
+}
+</style>
+</head>
+<body>
+<div class="quiz-container">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="player-info">
+    <div class="player-avatar" id="playerAvatar">?</div>
+    <div>
+      <div class="player-name" id="playerNameDisplay">Aucun joueur</div>
+      <div class="player-stats" id="playerStats">Connecte-toi !</div>
+    </div>
+  </div>
+  <div class="player-selector">
+    <select id="playerSelect" onchange="switchPlayer(this.value)"><option value="">-- Joueur --</option></select>
+    <button class="btn btn-primary" onclick="createNewPlayer()">+ Nouveau</button>
+    <button class="btn btn-danger" onclick="deleteCurrentPlayer()">✕</button>
+  </div>
+  <div class="header-score" id="headerScore">0 pts</div>
+</div>
+
+<!-- NAV -->
+<div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+  <button class="btn btn-primary" onclick="showSection('accueil')">🏠</button>
+  <button class="btn" onclick="showSection('lecons')" style="background:#f0f4ff;color:var(--primary)">📚 Leçons</button>
+  <button class="btn" onclick="showSection('niveaux')" style="background:#f0fff4;color:#276749">🎮 Niveaux</button>
+  <button class="btn" onclick="window.open('dashboard.html','_blank')" style="background:#fff5d6;color:#744210">📊 Espace</button>
+  <button class="btn" onclick="window.open('lexique.html','_blank')" style="background:#f5e8ff;color:#553c9a">📖 Lexique</button>
+</div>
+
+<!-- ACCUEIL -->
+<div id="accueil" class="section active">
+  <div class="home-title">English Master 🎓</div>
+  <div class="home-sub">Deviens champion de l'anglais, un niveau à la fois !</div>
+  <div class="home-stats">
+    <div class="home-stat"><div class="home-stat-num" id="homeLevel">1</div><div class="home-stat-label">Niveau</div></div>
+    <div class="home-stat"><div class="home-stat-num" id="homeScore">0</div><div class="home-stat-label">Points</div></div>
+    <div class="home-stat"><div class="home-stat-num" id="homeStreak">0</div><div class="home-stat-label">Série 🔥</div></div>
+    <div class="home-stat"><div class="home-stat-num" id="homeRate">0%</div><div class="home-stat-label">Réussite</div></div>
+  </div>
+  <div class="home-btns">
+    <button class="btn btn-primary" onclick="showSection('lecons')">📚 Voir les leçons</button>
+    <button class="btn btn-success" onclick="showSection('niveaux')">🎮 Jouer maintenant</button>
+  </div>
+</div>
+
+<!-- LEÇONS -->
+<div id="lecons" class="section">
+  <h2 style="margin-bottom:16px;color:var(--text)">📚 Les Leçons</h2>
+  <p style="color:#718096;margin-bottom:16px">Clique sur une leçon pour la lire. Courte, claire, efficace !</p>
+  <div class="lessons-list" id="lessonsContainer"></div>
+  <button class="btn btn-primary" onclick="showSection('niveaux')" style="margin-top:18px;width:100%;padding:13px">Je suis prêt — jouer ! 🎮</button>
+</div>
+
+<!-- NIVEAUX -->
+<div id="niveaux" class="section">
+  <h2 style="margin-bottom:8px;color:var(--text)">🎮 Choisir un niveau</h2>
+  <div class="mode-selector">
+    <div class="mode-title">Mode de jeu :</div>
+    <div class="mode-btns">
+      <button class="mode-btn selected" id="btnMixte" onclick="selectMode('mixte')">🎲 Mixte</button>
+      <button class="mode-btn" id="btnQcm" onclick="selectMode('qcm')">🎯 QCM</button>
+      <button class="mode-btn" id="btnLibre" onclick="selectMode('libre')">✍️ Écrit</button>
+    </div>
+  </div>
+  <div class="levels-container" id="levelsContainer"></div>
+</div>
+
+<!-- JEU -->
+<div id="jeu" class="section">
+  <h2 id="gameTitle" style="margin-bottom:14px;color:var(--text)">Niveau 1</h2>
+  <div class="progress-wrap">
+    <div style="display:flex;justify-content:space-between;font-size:.85em;color:#718096;margin-bottom:4px">
+      <span id="questionCounter">Q1/10</span><span id="scoreDisplay">0 pts</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+  <div class="question-box">
+    <div class="question-num" id="questionNum"></div>
+    <div class="question-text" id="questionText"></div>
+    <div class="options-grid" id="qcmOptions" style="display:none"></div>
+    <div id="libreInput" style="display:none">
+      <input type="text" class="answer-input" id="answerInput" placeholder="Tape ta réponse..." onkeyup="if(event.key==='Enter')validateAnswer()">
+    </div>
+    <div class="feedback" id="feedback">
+      <div class="feedback-title" id="feedbackTitle"></div>
+      <div id="feedbackCorrect" style="font-size:.95em"></div>
+      <div class="feedback-explanation" id="feedbackExplanation"></div>
+    </div>
+  </div>
+  <div class="game-actions">
+    <button class="btn" onclick="quitGame()" style="background:#f8fafc;color:#718096">⬅ Quitter</button>
+    <button class="btn btn-primary" id="validateBtn" onclick="validateAnswer()">✓ Valider</button>
+    <button class="btn btn-success" id="nextBtn" onclick="nextQuestion()" style="display:none">Suivant →</button>
+  </div>
+</div>
+
+<!-- RÉSULTATS -->
+<div id="resultats" class="section">
+  <div class="results-box">
+    <div class="result-score-circle">
+      <div class="result-score-num" id="resultPct">0%</div>
+      <div class="result-score-sub">réussite</div>
+    </div>
+    <div class="result-msg" id="resultMsg"></div>
+    <div class="result-btns">
+      <button class="btn" onclick="retryLevel()" style="background:#f8fafc">🔁 Rejouer</button>
+      <button class="btn btn-primary" id="nextLevelBtn" onclick="startNextLevel()" style="display:none">Niveau suivant →</button>
+      <button class="btn" onclick="showSection('niveaux')" style="background:#f0f4ff;color:var(--primary)">Tous les niveaux</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /.quiz-container -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// CONFIG SUJET — Modifier ici pour changer de matière
+// ═══════════════════════════════════════════════════════════════════
+const SUBJECT_CONFIG = {
+  name: "English Master",
+  emoji: "🎓",
+  lang: "fr",
+  storageKey: "englishMaster_v4",
+  playersKey: "englishMaster_players",
+  dashboardFile: "dashboard.html",
+  lexiqueFile: "lexique.html"
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// LEÇONS (basées sur le cahier CM2)
+// ═══════════════════════════════════════════════════════════════════
+const LESSONS_DATA = [
+  {
+    num:1, title:"TO BE / TO HAVE (Être / Avoir)",
+    content:`<div class="lesson-rule"><h4>TO BE — Je/Tu/Il/Nous/Vous/Ils</h4>
+    <table class="lesson-table"><tr><th>Français</th><th>Anglais</th><th>Contracté</th></tr>
+    <tr><td>Je suis</td><td>I am</td><td>I'm</td></tr>
+    <tr><td>Tu es</td><td>You are</td><td>You're</td></tr>
+    <tr><td>Il/Elle est</td><td>He/She/It is</td><td>He's / She's</td></tr>
+    <tr><td>Nous sommes</td><td>We are</td><td>We're</td></tr>
+    <tr><td>Ils/Elles sont</td><td>They are</td><td>They're</td></tr>
+    </table></div>
+    <div class="lesson-warning">⚠️ L'âge se dit avec TO BE : <strong>"I am 10 years old"</strong> (pas "I have 10 years" !)</div>
+    <div class="lesson-rule"><h4>TO HAVE (avoir / possession)</h4>
+    <p>I/You/We/They → <strong>have</strong> &nbsp;|&nbsp; He/She/It → <strong>has</strong></p>
+    <p style="margin-top:6px">Négation : I <strong>haven't</strong> / She <strong>hasn't</strong></p></div>
+    <div class="lesson-example">✅ She <strong>is</strong> a doctor. &nbsp; He <strong>has</strong> blue eyes. &nbsp; I <strong>am</strong> 10.</div>`
+  },
+  {
+    num:2, title:"Présent Simple (habitudes, routines)",
+    content:`<div class="lesson-rule"><h4>Formation</h4>
+    <p><strong>I/You/We/They</strong> + verbe : <em>I play, They work</em></p>
+    <p style="margin-top:5px"><strong>He/She/It</strong> + verbe + <strong>S</strong> : <em>He plays, She works</em></p>
+    <p style="margin-top:5px">Négation : don't / doesn't &nbsp;|&nbsp; Question : Do/Does ?</p></div>
+    <div class="lesson-warning">⚠️ Après <strong>does/doesn't</strong>, le verbe ne prend <strong>PAS de S</strong> !<br>❌ He doesn't plays → ✅ He doesn't <strong>play</strong></div>
+    <div class="lesson-example">✅ She <strong>speaks</strong> English. &nbsp; Does he <strong>play</strong>? &nbsp; They don't <strong>eat</strong> meat.</div>`
+  },
+  {
+    num:3, title:"Présent Continu (action en ce moment)",
+    content:`<div class="lesson-rule"><h4>Formation : BE + verbe -ING</h4>
+    <p>I <strong>am</strong> playing &nbsp;|&nbsp; She <strong>is</strong> eating &nbsp;|&nbsp; They <strong>are</strong> running</p></div>
+    <div class="lesson-rule"><h4>Mots déclencheurs</h4>
+    <p>now, right now, look!, listen!, at the moment, be quiet!</p></div>
+    <div class="lesson-warning">⚠️ Consonne finale doublée : run → runn<strong>ing</strong> | swim → swimm<strong>ing</strong><br>E final muet enlevé : make → mak<strong>ing</strong></div>
+    <div class="lesson-example">✅ Look! The baby <strong>is crying</strong>. &nbsp; Shh! I <strong>am reading</strong>.</div>`
+  },
+  {
+    num:4, title:"Do / Does / Did (questions et négations)",
+    content:`<div class="lesson-rule"><h4>Présent</h4>
+    <p><strong>Do</strong> → I, You, We, They &nbsp;|&nbsp; <strong>Does</strong> → He, She, It</p>
+    <p style="margin-top:5px">Négation : <strong>don't</strong> (I) / <strong>doesn't</strong> (she)</p></div>
+    <div class="lesson-rule"><h4>Passé</h4>
+    <p><strong>Did</strong> → toutes les personnes (hier, last week…)</p>
+    <p style="margin-top:5px">Négation passé : <strong>didn't</strong> + infinitif</p></div>
+    <div class="lesson-example">✅ <strong>Do</strong> you like pizza? &nbsp; <strong>Does</strong> she work? &nbsp; <strong>Did</strong> he go yesterday?</div>`
+  },
+  {
+    num:5, title:"Prétérit Was / Were (état passé)",
+    content:`<div class="lesson-rule"><h4>Formes</h4>
+    <p>I/He/She/It → <strong>was</strong> &nbsp;|&nbsp; You/We/They → <strong>were</strong></p>
+    <p style="margin-top:5px">Négation : <strong>wasn't</strong> / <strong>weren't</strong></p></div>
+    <div class="lesson-example">✅ I <strong>was</strong> happy yesterday. &nbsp; They <strong>were</strong> at the cinema. &nbsp; <strong>Was</strong> she angry?</div>`
+  },
+  {
+    num:6, title:"Prétérit Irréguliers (actions passées)",
+    content:`<div class="lesson-rule"><h4>Verbes irréguliers à connaître</h4>
+    <table class="lesson-table"><tr><th>Infinitif</th><th>Prétérit</th><th>Infinitif</th><th>Prétérit</th></tr>
+    <tr><td>go</td><td>went</td><td>eat</td><td>ate</td></tr>
+    <tr><td>see</td><td>saw</td><td>take</td><td>took</td></tr>
+    <tr><td>have</td><td>had</td><td>come</td><td>came</td></tr>
+    <tr><td>give</td><td>gave</td><td>tell</td><td>told</td></tr>
+    <tr><td>buy</td><td>bought</td><td>write</td><td>wrote</td></tr>
+    <tr><td>hear</td><td>heard</td><td>lose</td><td>lost</td></tr>
+    </table></div>
+    <div class="lesson-example">✅ Yesterday I <strong>went</strong> to school. &nbsp; She <strong>ate</strong> pizza.</div>`
+  },
+  {
+    num:7, title:"Futur : Will / Going to",
+    content:`<div class="lesson-rule"><h4>WILL = décision spontanée, promesse, prédiction</h4>
+    <p>Sujet + <strong>will</strong> + infinitif &nbsp;|&nbsp; Négation : <strong>won't</strong></p>
+    <p style="margin-top:5px">Ex: I think it <strong>will</strong> rain. &nbsp; I <strong>will</strong> call you later.</p></div>
+    <div class="lesson-rule"><h4>GOING TO = plan, intention, signe visible</h4>
+    <p>Sujet + BE + <strong>going to</strong> + infinitif</p>
+    <p style="margin-top:5px">Ex: It <strong>is going to</strong> rain (nuages !). &nbsp; She <strong>is going to</strong> study.</p></div>
+    <div class="lesson-example">✅ <strong>Will</strong> you help me? &nbsp; Look! He <strong>is going to</strong> fall!</div>`
+  },
+  {
+    num:8, title:"Present Perfect (expériences de vie)",
+    content:`<div class="lesson-rule"><h4>Formation : HAVE/HAS + participe passé</h4>
+    <p>I/You/We/They → <strong>have</strong> &nbsp;|&nbsp; He/She/It → <strong>has</strong></p></div>
+    <div class="lesson-rule"><h4>Mots clés</h4>
+    <p><strong>never</strong> (jamais), <strong>ever</strong> (déjà?), <strong>already</strong> (déjà), <strong>yet</strong> (encore/déjà), <strong>just</strong> (à l'instant), <strong>since</strong> (depuis), <strong>for</strong> (depuis/durée)</p></div>
+    <div class="lesson-example">✅ I <strong>have never been</strong> to Paris. &nbsp; She <strong>has just left</strong>. &nbsp; They <strong>have lived</strong> here for 5 years.</div>`
+  },
+  {
+    num:9, title:"Modaux : Can / Must / Should / Might",
+    content:`<div class="lesson-rule"><h4>Les modaux</h4>
+    <table class="lesson-table"><tr><th>Modal</th><th>Sens</th><th>Exemple</th></tr>
+    <tr><td><strong>can</strong></td><td>capacité / permission</td><td>I can swim.</td></tr>
+    <tr><td><strong>must</strong></td><td>obligation forte</td><td>You must stop.</td></tr>
+    <tr><td><strong>should</strong></td><td>conseil</td><td>You should sleep.</td></tr>
+    <tr><td><strong>might</strong></td><td>possibilité faible</td><td>He might be home.</td></tr>
+    </table></div>
+    <div class="lesson-warning">⚠️ Les modaux ne prennent <strong>jamais de S</strong> : ❌ She cans → ✅ She <strong>can</strong></div>`
+  },
+  {
+    num:10, title:"Phrases Complexes (If, Although, Because…)",
+    content:`<div class="lesson-rule"><h4>Conjonctions essentielles</h4>
+    <table class="lesson-table"><tr><th>Mot</th><th>Sens</th><th>Temps utilisé</th></tr>
+    <tr><td><strong>if</strong></td><td>si (condition)</td><td>IF + présent → WILL (réel)<br>IF + prétérit → WOULD (imaginaire)</td></tr>
+    <tr><td><strong>unless</strong></td><td>sauf si / à moins que</td><td>même règle que IF</td></tr>
+    <tr><td><strong>although</strong></td><td>bien que</td><td>+ n'importe quel temps</td></tr>
+    <tr><td><strong>because</strong></td><td>parce que</td><td>+ n'importe quel temps</td></tr>
+    </table></div>
+    <div class="lesson-example">✅ <strong>If</strong> it rains, I <strong>will</strong> stay home. &nbsp; <strong>If</strong> I <strong>were</strong> you, I would go.</div>`
+  }
+];
+
+// ═══════════════════════════════════════════════════════════════════
+// BASE DE DONNÉES DES QUESTIONS (10 niveaux × 40 questions)
+// Pour modifier : ajouter/remplacer des objets dans qcm[] ou libre[]
+// ═══════════════════════════════════════════════════════════════════
+const QUESTIONS_DB = {
+  1:{title:"Décollage 🚀",objective:"To Be / To Have",
+  qcm:[
+    {q:"I ___ a student.",options:["am","is","are","have"],correct:"am",explanation:"Avec 'I', to be = am."},
+    {q:"She ___ got a cat.",options:["have","has","is","are"],correct:"has",explanation:"She/He/It + has (To Have)."},
+    {q:"___ you happy?",options:["Are","Is","Do","Have"],correct:"Are",explanation:"You + Are (To Be)."},
+    {q:"We ___ in Paris.",options:["am","is","are","have"],correct:"are",explanation:"We/You/They + are."},
+    {q:"My father ___ 40 years old.",options:["have","has","is","are"],correct:"is",explanation:"L'âge = TO BE. He is 40."},
+    {q:"They ___ got two dogs.",options:["have","has","are","is"],correct:"have",explanation:"They + have (pluriel)."},
+    {q:"He ___ a doctor.",options:["is","are","am","have"],correct:"is",explanation:"Métier = TO BE. He is a doctor."},
+    {q:"___ she your sister?",options:["Is","Are","Do","Has"],correct:"Is",explanation:"She + Is (question)."},
+    {q:"I ___ got blue eyes.",options:["have","has","am","is"],correct:"have",explanation:"I have got = possession."},
+    {q:"It ___ a big house.",options:["is","are","am","have"],correct:"is",explanation:"It + is (singulier)."},
+    {q:"You ___ very tall.",options:["are","is","am","have"],correct:"are",explanation:"You + are (toujours)."},
+    {q:"___ we ready?",options:["Are","Is","Do","Have"],correct:"Are",explanation:"We + Are (question)."},
+    {q:"My mother ___ 35 years old.",options:["is","are","am","has"],correct:"is",explanation:"Âge = TO BE."},
+    {q:"They ___ in London.",options:["are","is","am","have"],correct:"are",explanation:"They are in London."},
+    {q:"He ___ got a new bike.",options:["has","have","is","are"],correct:"has",explanation:"He has got = possession."},
+    {q:"I ___ tired today.",options:["am","is","are","have"],correct:"am",explanation:"I am tired (état)."},
+    {q:"___ your parents at home?",options:["Are","Is","Do","Have"],correct:"Are",explanation:"Parents = pluriel = Are."},
+    {q:"She ___ a teacher.",options:["is","are","am","have"],correct:"is",explanation:"Métier = TO BE."},
+    {q:"We ___ got a big family.",options:["have","has","are","is"],correct:"have",explanation:"We have got = possession."},
+    {q:"It ___ sunny today.",options:["is","are","am","have"],correct:"is",explanation:"Météo = It is sunny."}
+  ],
+  libre:[
+    {q:"I ___ (be) tired today.",answer:"am",alternatives:["'m"],explanation:"I + am."},
+    {q:"Traduis : 'J'ai 10 ans.'",answer:"I am 10",alternatives:["I'm 10","I am ten","I'm ten"],explanation:"Âge = TO BE. I am 10 years old."},
+    {q:"She ___ (have) blue eyes.",answer:"has",alternatives:["'s got","has got"],explanation:"She + has."},
+    {q:"___ (be) they at school?",answer:"Are",alternatives:["are"],explanation:"They + Are (question)."},
+    {q:"My parents ___ (be) teachers.",answer:"are",alternatives:["'re"],explanation:"Pluriel = are."},
+    {q:"He ___ (be) my brother.",answer:"is",alternatives:["'s"],explanation:"He + is."},
+    {q:"We ___ (have) got a cat.",answer:"have",alternatives:["'ve got"],explanation:"We + have."},
+    {q:"___ (be) you happy?",answer:"Are",alternatives:["are"],explanation:"You + Are (question)."},
+    {q:"It ___ (be) a beautiful day.",answer:"is",alternatives:["'s"],explanation:"It + is."},
+    {q:"They ___ (have) two children.",answer:"have",alternatives:["'ve got"],explanation:"They + have."},
+    {q:"My sister ___ (be) 15 years old.",answer:"is",alternatives:["'s"],explanation:"Âge = TO BE."},
+    {q:"I ___ (not/be) hungry.",answer:"am not",alternatives:["'m not"],explanation:"I am not (I'm not)."},
+    {q:"___ (have) you got any pets?",answer:"Have",alternatives:["have"],explanation:"Have got pour la possession."},
+    {q:"She ___ (not/be) at school today.",answer:"is not",alternatives:["isn't","'s not"],explanation:"She is not (isn't)."},
+    {q:"We ___ (be) in the classroom.",answer:"are",alternatives:["'re"],explanation:"We are (lieu)."},
+    {q:"He ___ (have) brown hair.",answer:"has",alternatives:["'s got"],explanation:"He has (description)."},
+    {q:"___ (be) your father a doctor?",answer:"Is",alternatives:["is"],explanation:"Your father = he = Is."},
+    {q:"I ___ (have) a headache.",answer:"have",alternatives:["'ve got"],explanation:"Maladie = have got."},
+    {q:"They ___ (be) very nice.",answer:"are",alternatives:["'re"],explanation:"They are (caractère)."},
+    {q:"It ___ (not/be) cold today.",answer:"is not",alternatives:["isn't","'s not"],explanation:"It is not cold."}
+  ]},
+  2:{title:"Routine 📅",objective:"Present Simple",
+  qcm:[
+    {q:"He ___ TV every evening.",options:["watch","watchs","watches","watching"],correct:"watches",explanation:"He/She/It + verbe+S (watch→watches)."},
+    {q:"I don't ___ coffee.",options:["drinks","drinking","drink","drunk"],correct:"drink",explanation:"Don't + infinitif (pas de S)."},
+    {q:"___ she play tennis?",options:["Do","Does","Is","Are"],correct:"Does",explanation:"Does pour He/She/It."},
+    {q:"The sun ___ in the east.",options:["rise","rises","rising","rose"],correct:"rises",explanation:"Vérité générale + S."},
+    {q:"They ___ to school by bus.",options:["go","goes","going","gos"],correct:"go",explanation:"They + verbe sans S."},
+    {q:"She ___ English very well.",options:["speak","speaks","speaking","speaken"],correct:"speaks",explanation:"She + speaks (3ème pers)."},
+    {q:"We don't ___ meat.",options:["eat","eats","eating","ate"],correct:"eat",explanation:"We + don't + infinitif."},
+    {q:"___ he work in Paris?",options:["Do","Does","Is","Are"],correct:"Does",explanation:"Does pour he."},
+    {q:"My father ___ at 7 o'clock.",options:["get up","gets up","getting up","got up"],correct:"gets up",explanation:"Routine: He + gets up."},
+    {q:"I always ___ my teeth.",options:["brush","brushes","brushing","brushed"],correct:"brush",explanation:"I + infinitif (pas de S)."},
+    {q:"The train ___ at 8:15.",options:["leave","leaves","leaving","left"],correct:"leaves",explanation:"Horaire fixe + S."},
+    {q:"___ they live here?",options:["Do","Does","Are","Is"],correct:"Do",explanation:"Do pour They."},
+    {q:"She ___ like chocolate.",options:["don't","doesn't","isn't","aren't"],correct:"doesn't",explanation:"She + doesn't (négation)."},
+    {q:"Water ___ at 100 degrees.",options:["boil","boils","boiling","boiled"],correct:"boils",explanation:"Vérité scientifique + S."},
+    {q:"We ___ football on Sundays.",options:["play","plays","playing","played"],correct:"play",explanation:"We + infinitif (habitude)."},
+    {q:"___ your mother cook?",options:["Do","Does","Is","Are"],correct:"Does",explanation:"Does pour your mother (she)."},
+    {q:"He ___ his car every week.",options:["wash","washes","washing","washed"],correct:"washes",explanation:"He + washes (3ème pers +ES)."},
+    {q:"I never ___ late.",options:["arrive","arrives","arriving","arrived"],correct:"arrive",explanation:"I + infinitif + never."},
+    {q:"The shop ___ at 9am.",options:["open","opens","opening","opened"],correct:"opens",explanation:"Horaire d'ouverture + S."},
+    {q:"___ you understand?",options:["Do","Does","Are","Is"],correct:"Do",explanation:"Do pour You."}
+  ],
+  libre:[
+    {q:"She (watch) ___ TV every day.",answer:"watches",explanation:"3ème pers + ES après CH."},
+    {q:"I (not/like) ___ vegetables.",answer:"don't like",alternatives:["do not like"],explanation:"I + don't + infinitif."},
+    {q:"___ (do) he (work) ___ in London?",answer:"Does work",explanation:"Does + infinitif (pas de S)."},
+    {q:"The train (leave) ___ at 8 o'clock.",answer:"leaves",explanation:"Horaire = présent simple + S."},
+    {q:"Water (boil) ___ at 100 degrees.",answer:"boils",explanation:"Vérité scientifique."},
+    {q:"They (play) ___ tennis on Saturdays.",answer:"play",explanation:"They + infinitif."},
+    {q:"___ (do) she (speak) ___ French?",answer:"Does speak",explanation:"Does + infinitif."},
+    {q:"My brother (not/live) ___ here.",answer:"doesn't live",alternatives:["does not live"],explanation:"He + doesn't + infinitif."},
+    {q:"We (go) ___ to school by bus.",answer:"go",explanation:"We + infinitif."},
+    {q:"The sun (rise) ___ in the east.",answer:"rises",explanation:"Vérité générale + S."},
+    {q:"___ (do) you (eat) ___ meat?",answer:"Do eat",explanation:"Do + infinitif."},
+    {q:"She (get up) ___ at 7am.",answer:"gets up",explanation:"Routine: She + gets up."},
+    {q:"I (brush) ___ my teeth twice a day.",answer:"brush",explanation:"I + infinitif."},
+    {q:"He (not/watch) ___ TV.",answer:"doesn't watch",alternatives:["does not watch"],explanation:"He + doesn't + infinitif."},
+    {q:"___ (do) they (have) ___ children?",answer:"Do have",explanation:"Do + infinitif."},
+    {q:"The shop (close) ___ at 8pm.",answer:"closes",explanation:"Horaire + S."},
+    {q:"We (not/go) ___ to school on Sundays.",answer:"don't go",alternatives:["do not go"],explanation:"We + don't + infinitif."},
+    {q:"She (study) ___ English.",answer:"studies",explanation:"Consonne + Y → IES (study→studies)."},
+    {q:"___ (do) it (rain) ___ often?",answer:"Does rain",explanation:"Does pour It."},
+    {q:"I (always/eat) ___ breakfast.",answer:"always eat",explanation:"Adverbe de fréquence + verbe."}
+  ]},
+  3:{title:"En ce moment 👁️",objective:"Present Continuous",
+  qcm:[
+    {q:"Look! The cat ___ on the sofa.",options:["sleep","sleeps","is sleeping","sleeping"],correct:"is sleeping",explanation:"Look! = action en cours = BE + -ING."},
+    {q:"Shh! I ___ to music.",options:["am listening","listen","listens","listening"],correct:"am listening",explanation:"Shh! = maintenant = BE + -ING."},
+    {q:"They ___ football now.",options:["are playing","play","plays","playing"],correct:"are playing",explanation:"Now = présent continu."},
+    {q:"___ you watching TV?",options:["Do","Are","Is","Does"],correct:"Are",explanation:"Question PC: BE + sujet + -ING."},
+    {q:"She isn't ___ now.",options:["work","works","working","worked"],correct:"working",explanation:"BE + not + -ING."},
+    {q:"Listen! The baby ___.",options:["cry","cries","is crying","crying"],correct:"is crying",explanation:"Listen! = action en cours."},
+    {q:"We ___ a movie right now.",options:["watch","watches","are watching","watching"],correct:"are watching",explanation:"Right now = présent continu."},
+    {q:"He ___ his homework at the moment.",options:["do","does","is doing","doing"],correct:"is doing",explanation:"At the moment = en ce moment = PC."},
+    {q:"___ they coming to the party?",options:["Do","Are","Is","Does"],correct:"Are",explanation:"Are + they + -ING."},
+    {q:"I ___ a book. Be quiet!",options:["read","reads","am reading","reading"],correct:"am reading",explanation:"Be quiet! = action en cours."},
+    {q:"It ___ outside. Take an umbrella!",options:["rain","rains","is raining","raining"],correct:"is raining",explanation:"Action en cours = PC."},
+    {q:"She ___ on the phone.",options:["talk","talks","is talking","talking"],correct:"is talking",explanation:"Action en cours = BE + -ING."},
+    {q:"___ he sleeping?",options:["Do","Is","Are","Does"],correct:"Is",explanation:"Is + he + -ING."},
+    {q:"We aren't ___ yet.",options:["leave","leaves","leaving","left"],correct:"leaving",explanation:"BE + not + -ING."},
+    {q:"Look! The children ___ in the garden.",options:["play","plays","are playing","playing"],correct:"are playing",explanation:"Look! = PC."},
+    {q:"I ___ for my keys. I can't find them!",options:["look","looks","am looking","looking"],correct:"am looking",explanation:"Action temporaire = PC."},
+    {q:"She ___ dinner right now.",options:["cook","cooks","is cooking","cooking"],correct:"is cooking",explanation:"Right now = PC."},
+    {q:"___ you listening to me?",options:["Do","Are","Is","Does"],correct:"Are",explanation:"Are + you + -ING."},
+    {q:"They ___ in the pool.",options:["swim","swims","are swimming","swimming"],correct:"are swimming",explanation:"Action en cours = PC."},
+    {q:"He ___ a letter at the moment.",options:["write","writes","is writing","writing"],correct:"is writing",explanation:"At the moment = PC."}
+  ],
+  libre:[
+    {q:"Listen! The baby (cry) ___.",answer:"is crying",alternatives:["'s crying"],explanation:"Listen! = BE + -ING."},
+    {q:"Be quiet! I (read) ___ a book.",answer:"am reading",alternatives:["'m reading"],explanation:"Be quiet! = action en cours."},
+    {q:"Right now, she (eat) ___ dinner.",answer:"is eating",alternatives:["'s eating"],explanation:"Right now = présent continu."},
+    {q:"Look! It (rain) ___.",answer:"is raining",alternatives:["'s raining"],explanation:"Look! = en ce moment."},
+    {q:"Why (be) ___ you (laugh) ___?",answer:"are laughing",explanation:"Question PC: BE + -ING."},
+    {q:"We (watch) ___ a movie now.",answer:"are watching",alternatives:["'re watching"],explanation:"Now = PC."},
+    {q:"He (not/sleep) ___.",answer:"is not sleeping",alternatives:["isn't sleeping","'s not sleeping"],explanation:"BE + not + -ING."},
+    {q:"___ (be) they (play) ___?",answer:"Are playing",explanation:"Are + -ING."},
+    {q:"I (look) ___ for my phone.",answer:"am looking",alternatives:["'m looking"],explanation:"Action temporaire = PC."},
+    {q:"She (talk) ___ on the phone.",answer:"is talking",alternatives:["'s talking"],explanation:"Action en cours."},
+    {q:"___ (be) he (do) ___ his homework?",answer:"Is doing",explanation:"Is + -ING."},
+    {q:"The children (play) ___ outside.",answer:"are playing",alternatives:["'re playing"],explanation:"Action en cours."},
+    {q:"I (not/understand) ___.",answer:"am not understanding",alternatives:["'m not understanding"],explanation:"BE + not + -ING."},
+    {q:"___ (be) it (rain) ___?",answer:"Is raining",explanation:"Is + -ING."},
+    {q:"We (have) ___ lunch at the moment.",answer:"are having",alternatives:["'re having"],explanation:"At the moment = PC."},
+    {q:"She (wear) ___ a beautiful dress.",answer:"is wearing",alternatives:["'s wearing"],explanation:"Action en cours."},
+    {q:"___ (be) you (wait) ___ for someone?",answer:"Are waiting",explanation:"Are + -ING."},
+    {q:"They (not/watch) ___ TV.",answer:"are not watching",alternatives:["aren't watching","'re not watching"],explanation:"BE + not + -ING."},
+    {q:"He (run) ___ fast!",answer:"is running",alternatives:["'s running"],explanation:"Consonne double + -ING (run→running)."},
+    {q:"Look! The dog (swim) ___!",answer:"is swimming",alternatives:["'s swimming"],explanation:"Look! = PC. M final double + -ING."}
+  ]},
+  4:{title:"Questions ❓",objective:"Do / Does / Did",
+  qcm:[
+    {q:"___ you like pizza?",options:["Do","Does","Are","Is"],correct:"Do",explanation:"Do pour I/You/We/They."},
+    {q:"Where ___ she live?",options:["do","does","is","are"],correct:"does",explanation:"Does pour He/She/It."},
+    {q:"___ he go yesterday?",options:["Do","Does","Did","Done"],correct:"Did",explanation:"Yesterday = passé = Did."},
+    {q:"I ___ understand.",options:["don't","doesn't","didn't","not"],correct:"don't",explanation:"I + don't (négation présent)."},
+    {q:"She ___ play on Sundays.",options:["don't","doesn't","didn't","isn't"],correct:"doesn't",explanation:"She + doesn't (négation)."},
+    {q:"___ they have a car?",options:["Do","Does","Are","Is"],correct:"Do",explanation:"Do pour they."},
+    {q:"Where ___ you go last week?",options:["do","does","did","are"],correct:"did",explanation:"Last week = passé = Did."},
+    {q:"He ___ like vegetables.",options:["don't","doesn't","didn't","isn't"],correct:"doesn't",explanation:"He + doesn't."},
+    {q:"___ we need to leave?",options:["Do","Does","Are","Is"],correct:"Do",explanation:"Do pour we."},
+    {q:"I ___ see him yesterday.",options:["don't","doesn't","didn't","not"],correct:"didn't",explanation:"Yesterday + négation = didn't."},
+    {q:"___ your mother cook well?",options:["Do","Does","Is","Are"],correct:"Does",explanation:"Does pour your mother (she)."},
+    {q:"They ___ want to come.",options:["don't","doesn't","didn't","aren't"],correct:"don't",explanation:"They + don't."},
+    {q:"___ she call you?",options:["Do","Does","Did","Done"],correct:"Did",explanation:"Passé = Did (question)."},
+    {q:"We ___ have any money.",options:["don't","doesn't","didn't","aren't"],correct:"don't",explanation:"We + don't + any."},
+    {q:"___ it rain a lot here?",options:["Do","Does","Is","Are"],correct:"Does",explanation:"Does pour it."},
+    {q:"You ___ answer my question.",options:["don't","doesn't","didn't","aren't"],correct:"didn't",explanation:"Didn't (passé négatif)."},
+    {q:"___ he know the answer?",options:["Do","Does","Is","Are"],correct:"Does",explanation:"Does pour he."},
+    {q:"I ___ think so.",options:["don't","doesn't","didn't","not"],correct:"don't",explanation:"I don't think so."},
+    {q:"___ you see that film?",options:["Do","Does","Did","Done"],correct:"Did",explanation:"Did pour le passé."},
+    {q:"She ___ work on Saturdays.",options:["don't","doesn't","didn't","isn't"],correct:"doesn't",explanation:"She + doesn't (habitude)."}
+  ],
+  libre:[
+    {q:"___ (do) you live in Paris?",answer:"Do",explanation:"You + Do."},
+    {q:"Where (do) ___ she (work) ___?",answer:"does work",explanation:"Does + infinitif (pas de S)."},
+    {q:"___ (do) he (go) ___ yesterday?",answer:"Did go",explanation:"Did + infinitif (passé)."},
+    {q:"I (not/like) ___ spinach.",answer:"don't like",alternatives:["do not like"],explanation:"Don't + infinitif."},
+    {q:"___ (do) they have pets?",answer:"Do",explanation:"They + Do."},
+    {q:"She (not/play) ___ tennis.",answer:"doesn't play",alternatives:["does not play"],explanation:"She + doesn't + infinitif."},
+    {q:"___ (do) we (need) ___ to hurry?",answer:"Do need",explanation:"Do + infinitif."},
+    {q:"He (not/understand) ___.",answer:"doesn't understand",alternatives:["does not understand"],explanation:"He + doesn't + infinitif."},
+    {q:"___ (do) you (see) ___ him last night?",answer:"Did see",explanation:"Did + infinitif (passé)."},
+    {q:"I (not/think) ___ so.",answer:"don't think",alternatives:["do not think"],explanation:"I don't think so."},
+    {q:"___ (do) your father (work) ___ here?",answer:"Does work",explanation:"Does + infinitif (3ème pers)."},
+    {q:"They (not/want) ___ to leave.",answer:"don't want",alternatives:["do not want"],explanation:"They + don't + infinitif."},
+    {q:"___ (do) she (call) ___ you?",answer:"Did call",explanation:"Did + infinitif (passé)."},
+    {q:"We (not/have) ___ time.",answer:"don't have",alternatives:["do not have"],explanation:"We + don't + infinitif."},
+    {q:"___ (do) it (rain) ___ often?",answer:"Does rain",explanation:"Does pour it."},
+    {q:"You (not/answer) ___ me.",answer:"didn't answer",alternatives:["did not answer"],explanation:"Didn't + infinitif (passé)."},
+    {q:"___ (do) he (know) ___ the truth?",answer:"Does know",explanation:"Does + infinitif."},
+    {q:"I (not/believe) ___ it.",answer:"don't believe",alternatives:["do not believe"],explanation:"I + don't + infinitif."},
+    {q:"___ (do) you (go) ___ to London?",answer:"Did go",explanation:"Did + infinitif (passé)."},
+    {q:"She (not/work) ___ on Sundays.",answer:"doesn't work",alternatives:["does not work"],explanation:"She + doesn't + infinitif."}
+  ]},
+  5:{title:"Retour en arrière ⏪",objective:"Prétérit Was / Were",
+  qcm:[
+    {q:"I ___ happy yesterday.",options:["was","were","am","is"],correct:"was",explanation:"I + WAS (prétérit de BE)."},
+    {q:"They ___ at the cinema last night.",options:["was","were","are","is"],correct:"were",explanation:"They + WERE (prétérit pluriel)."},
+    {q:"She ___ at school this morning.",options:["was","were","is","are"],correct:"was",explanation:"She + WAS."},
+    {q:"We ___ very tired after the trip.",options:["was","were","are","is"],correct:"were",explanation:"We + WERE."},
+    {q:"___ you at home?",options:["Was","Were","Are","Is"],correct:"Were",explanation:"You + WERE (question)."},
+    {q:"He ___ late for work.",options:["was","were","is","are"],correct:"was",explanation:"He + WAS."},
+    {q:"It ___ cold last winter.",options:["was","were","is","are"],correct:"was",explanation:"It + WAS."},
+    {q:"My parents ___ on holiday.",options:["was","were","is","are"],correct:"were",explanation:"Parents = pluriel = WERE."},
+    {q:"___ she angry?",options:["Was","Were","Is","Are"],correct:"Was",explanation:"She + WAS (question)."},
+    {q:"The children ___ very noisy.",options:["was","were","is","are"],correct:"were",explanation:"Children = pluriel = WERE."},
+    {q:"I ___ not at school.",options:["was","were","am","is"],correct:"was",explanation:"Négation: I was not (wasn't)."},
+    {q:"___ they ready?",options:["Was","Were","Are","Is"],correct:"Were",explanation:"They + WERE."},
+    {q:"The weather ___ beautiful.",options:["was","were","is","are"],correct:"was",explanation:"Weather = singulier = WAS."},
+    {q:"You ___ right!",options:["was","were","are","is"],correct:"were",explanation:"You + WERE."},
+    {q:"My brother ___ sick last week.",options:["was","were","is","are"],correct:"was",explanation:"He + WAS."},
+    {q:"___ we late?",options:["Was","Were","Are","Is"],correct:"Were",explanation:"We + WERE."},
+    {q:"The dogs ___ hungry.",options:["was","were","is","are"],correct:"were",explanation:"Dogs = pluriel = WERE."},
+    {q:"She ___ not happy with the result.",options:["was","were","is","are"],correct:"was",explanation:"She was not (wasn't)."},
+    {q:"I ___ very young in 2010.",options:["was","were","am","is"],correct:"was",explanation:"I + WAS + date passée."},
+    {q:"___ he your teacher?",options:["Was","Were","Is","Are"],correct:"Was",explanation:"He + WAS (question)."}
+  ],
+  libre:[
+    {q:"I (be) ___ happy yesterday.",answer:"was",explanation:"I + WAS."},
+    {q:"They (be) ___ at school.",answer:"were",explanation:"They + WERE."},
+    {q:"She (be) ___ at home last night.",answer:"was",explanation:"She + WAS."},
+    {q:"We (be) ___ very tired.",answer:"were",explanation:"We + WERE."},
+    {q:"___ (be) you at the party?",answer:"Were",alternatives:["were"],explanation:"You + WERE (question)."},
+    {q:"He (be) ___ late.",answer:"was",explanation:"He + WAS."},
+    {q:"It (be) ___ cold.",answer:"was",explanation:"It + WAS."},
+    {q:"My parents (be) ___ on holiday.",answer:"were",explanation:"Pluriel = WERE."},
+    {q:"___ (be) she angry?",answer:"Was",alternatives:["was"],explanation:"She + WAS (question)."},
+    {q:"The children (be) ___ noisy.",answer:"were",explanation:"Pluriel = WERE."},
+    {q:"I (be/not) ___ at school.",answer:"was not",alternatives:["wasn't"],explanation:"I was not."},
+    {q:"___ (be) they ready?",answer:"Were",alternatives:["were"],explanation:"They + WERE."},
+    {q:"The weather (be) ___ nice.",answer:"was",explanation:"Singulier = WAS."},
+    {q:"You (be) ___ right.",answer:"were",explanation:"You + WERE."},
+    {q:"My brother (be) ___ sick.",answer:"was",explanation:"He + WAS."},
+    {q:"___ (be) we late?",answer:"Were",alternatives:["were"],explanation:"We + WERE."},
+    {q:"The dogs (be) ___ hungry.",answer:"were",explanation:"Pluriel = WERE."},
+    {q:"She (be/not) ___ happy.",answer:"was not",alternatives:["wasn't"],explanation:"She was not."},
+    {q:"I (be) ___ young in 2010.",answer:"was",explanation:"I + WAS + date passée."},
+    {q:"___ (be) he your teacher?",answer:"Was",alternatives:["was"],explanation:"He + WAS."}
+  ]},
+  6:{title:"Aventurier ⚔️",objective:"Prétérit irréguliers",
+  qcm:[
+    {q:"Yesterday I ___ to the shop.",options:["go","went","gone","going"],correct:"went",explanation:"GO → WENT (prétérit irrégulier)."},
+    {q:"She ___ a beautiful song.",options:["sing","sang","sung","singing"],correct:"sang",explanation:"SING → SANG."},
+    {q:"They ___ pizza for dinner.",options:["eat","ate","eaten","eating"],correct:"ate",explanation:"EAT → ATE."},
+    {q:"He ___ his leg.",options:["break","broke","broken","breaking"],correct:"broke",explanation:"BREAK → BROKE."},
+    {q:"We ___ the bus.",options:["take","took","taken","taking"],correct:"took",explanation:"TAKE → TOOK."},
+    {q:"I ___ a letter to my friend.",options:["write","wrote","written","writing"],correct:"wrote",explanation:"WRITE → WROTE."},
+    {q:"She ___ me a secret.",options:["tell","told","telled","telling"],correct:"told",explanation:"TELL → TOLD."},
+    {q:"They ___ swimming in the lake.",options:["go","went","gone","going"],correct:"went",explanation:"GO → WENT."},
+    {q:"He ___ up early.",options:["wake","woke","waken","waking"],correct:"woke",explanation:"WAKE → WOKE."},
+    {q:"I ___ my keys somewhere.",options:["lose","lost","losed","losing"],correct:"lost",explanation:"LOSE → LOST."},
+    {q:"She ___ a new dress.",options:["buy","bought","buyed","buying"],correct:"bought",explanation:"BUY → BOUGHT."},
+    {q:"We ___ a great time.",options:["have","had","haved","having"],correct:"had",explanation:"HAVE → HAD."},
+    {q:"He ___ the door.",options:["shut","shutted","shut","shutting"],correct:"shut",explanation:"SHUT → SHUT (inchangé)."},
+    {q:"I ___ him yesterday.",options:["see","saw","seen","seeing"],correct:"saw",explanation:"SEE → SAW."},
+    {q:"They ___ a noise.",options:["hear","heard","heared","hearing"],correct:"heard",explanation:"HEAR → HEARD."},
+    {q:"She ___ her phone.",options:["forget","forgot","forgotten","forgetting"],correct:"forgot",explanation:"FORGET → FORGOT."},
+    {q:"We ___ the game.",options:["win","won","winned","winning"],correct:"won",explanation:"WIN → WON."},
+    {q:"I ___ my homework.",options:["do","did","done","doing"],correct:"did",explanation:"DO → DID."},
+    {q:"He ___ me the truth.",options:["say","said","says","saying"],correct:"said",explanation:"SAY → SAID."},
+    {q:"They ___ home late.",options:["come","came","comed","coming"],correct:"came",explanation:"COME → CAME."}
+  ],
+  libre:[
+    {q:"Yesterday I (go) ___ to the shop.",answer:"went",explanation:"GO → WENT."},
+    {q:"She (sing) ___ a song.",answer:"sang",explanation:"SING → SANG."},
+    {q:"They (eat) ___ pizza.",answer:"ate",explanation:"EAT → ATE."},
+    {q:"He (break) ___ his leg.",answer:"broke",explanation:"BREAK → BROKE."},
+    {q:"We (take) ___ the bus.",answer:"took",explanation:"TAKE → TOOK."},
+    {q:"I (write) ___ a letter.",answer:"wrote",explanation:"WRITE → WROTE."},
+    {q:"She (tell) ___ me a secret.",answer:"told",explanation:"TELL → TOLD."},
+    {q:"They (go) ___ swimming.",answer:"went",explanation:"GO → WENT."},
+    {q:"He (wake) ___ up early.",answer:"woke",explanation:"WAKE → WOKE."},
+    {q:"I (lose) ___ my keys.",answer:"lost",explanation:"LOSE → LOST."},
+    {q:"She (buy) ___ a dress.",answer:"bought",explanation:"BUY → BOUGHT."},
+    {q:"We (have) ___ a great time.",answer:"had",explanation:"HAVE → HAD."},
+    {q:"He (shut) ___ the door.",answer:"shut",explanation:"SHUT → SHUT."},
+    {q:"I (see) ___ him.",answer:"saw",explanation:"SEE → SAW."},
+    {q:"They (hear) ___ a noise.",answer:"heard",explanation:"HEAR → HEARD."},
+    {q:"She (forget) ___ her phone.",answer:"forgot",explanation:"FORGET → FORGOT."},
+    {q:"We (win) ___ the game.",answer:"won",explanation:"WIN → WON."},
+    {q:"I (do) ___ my homework.",answer:"did",explanation:"DO → DID."},
+    {q:"He (say) ___ the truth.",answer:"said",explanation:"SAY → SAID."},
+    {q:"They (come) ___ home late.",answer:"came",explanation:"COME → CAME."}
+  ]},
+  7:{title:"Voyant 🔮",objective:"Futur (Will / Going to)",
+  qcm:[
+    {q:"I think it ___ rain tomorrow.",options:["will","going to","is","goes"],correct:"will",explanation:"Prédiction = WILL."},
+    {q:"Look at those clouds! It ___ rain.",options:["will","is going to","goes","is"],correct:"is going to",explanation:"Signe visible = GOING TO."},
+    {q:"___ you help me?",options:["Will","Are","Do","Going"],correct:"Will",explanation:"Demande = WILL."},
+    {q:"She ___ be a great doctor one day.",options:["will","going to","is","goes"],correct:"will",explanation:"Prédiction = WILL."},
+    {q:"We ___ visit grandma next week.",options:["will","are going to","go","going"],correct:"are going to",explanation:"Plan = GOING TO."},
+    {q:"I promise I ___ forget your birthday.",options:["will never","going never","am never","go never"],correct:"will never",explanation:"Promesse = WILL."},
+    {q:"They ___ move house soon.",options:["will","are going to","go","going"],correct:"are going to",explanation:"Plan préparé = GOING TO."},
+    {q:"Oh no! I ___ drop my phone!",options:["will","am going to","go","going"],correct:"am going to",explanation:"Imminent = GOING TO."},
+    {q:"___ he come to the party?",options:["Will","Is","Does","Going"],correct:"Will",explanation:"Question future = WILL."},
+    {q:"I promise I ___ be late.",options:["will not","going not","am not","go not"],correct:"will not",explanation:"Promesse négative = WILL NOT."},
+    {q:"She ___ study medicine.",options:["will","is going to","goes","going"],correct:"is going to",explanation:"Intention = GOING TO."},
+    {q:"___ we have a test today?",options:["Will","Are","Do","Going"],correct:"Will",explanation:"Question future = WILL."},
+    {q:"Watch out! You ___ fall!",options:["will","are going to","go","going"],correct:"are going to",explanation:"Danger imminent = GOING TO."},
+    {q:"I ___ call you later.",options:["will","going to","am","go"],correct:"will",explanation:"Décision spontanée = WILL."},
+    {q:"They ___ get married in June.",options:["will","are going to","go","going"],correct:"are going to",explanation:"Plan arrêté = GOING TO."},
+    {q:"That ___ be expensive!",options:["will","is going to","goes","going"],correct:"will",explanation:"Prédiction = WILL."},
+    {q:"I ___ buy some bread.",options:["will","am going to","go","going"],correct:"will",explanation:"Décision du moment = WILL."},
+    {q:"Look! The bus ___ crash!",options:["will","is going to","goes","going"],correct:"is going to",explanation:"Imminent visible = GOING TO."},
+    {q:"She ___ love this gift.",options:["will","is going to","goes","going"],correct:"will",explanation:"Prédiction = WILL."},
+    {q:"We ___ have a meeting at 3.",options:["will","are going to","go","going"],correct:"are going to",explanation:"Plan = GOING TO."}
+  ],
+  libre:[
+    {q:"I think it (rain) ___ tomorrow.",answer:"will rain",explanation:"Prédiction = WILL + infinitif."},
+    {q:"Look at the clouds! It (rain) ___.",answer:"is going to rain",alternatives:["'s going to rain"],explanation:"Signe visible = BE + GOING TO."},
+    {q:"___ (will) you help me?",answer:"Will",explanation:"Demande = WILL."},
+    {q:"She (be) ___ a doctor.",answer:"will be",explanation:"Prédiction = WILL."},
+    {q:"We (visit) ___ grandma next week.",answer:"are going to visit",alternatives:["'re going to visit"],explanation:"Plan = BE + GOING TO."},
+    {q:"I (never/forget) ___ your birthday.",answer:"will never forget",explanation:"Promesse = WILL."},
+    {q:"They (move) ___ soon.",answer:"are going to move",alternatives:["'re going to move"],explanation:"Plan préparé = GOING TO."},
+    {q:"Oh no! I (drop) ___ my phone!",answer:"am going to drop",alternatives:["'m going to drop"],explanation:"Imminent = GOING TO."},
+    {q:"___ (will) he come?",answer:"Will",explanation:"Question future = WILL."},
+    {q:"I promise I (not/be) ___ late.",answer:"will not be",alternatives:["won't be"],explanation:"Promesse = WILL NOT."},
+    {q:"She (study) ___ medicine.",answer:"is going to study",alternatives:["'s going to study"],explanation:"Intention = GOING TO."},
+    {q:"___ (will) we have a test?",answer:"Will",explanation:"Question future = WILL."},
+    {q:"Watch out! You (fall) ___!",answer:"are going to fall",alternatives:["'re going to fall"],explanation:"Danger imminent = GOING TO."},
+    {q:"I (call) ___ you later.",answer:"will call",explanation:"Décision spontanée = WILL."},
+    {q:"They (get) ___ married in June.",answer:"are going to get",alternatives:["'re going to get"],explanation:"Plan arrêté = GOING TO."},
+    {q:"That (be) ___ expensive!",answer:"will be",explanation:"Prédiction = WILL."},
+    {q:"I (buy) ___ some bread.",answer:"will buy",explanation:"Décision du moment = WILL."},
+    {q:"Look! The bus (crash) ___!",answer:"is going to crash",alternatives:["'s going to crash"],explanation:"Imminent visible = GOING TO."},
+    {q:"She (love) ___ this gift.",answer:"will love",explanation:"Prédiction = WILL."},
+    {q:"We (have) ___ a meeting at 3.",answer:"are going to have",alternatives:["'re going to have"],explanation:"Plan = GOING TO."}
+  ]},
+  8:{title:"Expériences 🏆",objective:"Present Perfect",
+  qcm:[
+    {q:"I ___ never been to Paris.",options:["have","has","had","am"],correct:"have",explanation:"I have never been (expérience de vie)."},
+    {q:"She ___ finished her homework.",options:["have","has","had","is"],correct:"has",explanation:"She has finished (action récente)."},
+    {q:"___ you ever eaten sushi?",options:["Have","Has","Did","Do"],correct:"Have",explanation:"Have pour you (question PP)."},
+    {q:"They ___ lived here for 10 years.",options:["have","has","had","are"],correct:"have",explanation:"They have lived (durée)."},
+    {q:"He ___ just left.",options:["have","has","had","is"],correct:"has",explanation:"Has just (action récente)."},
+    {q:"I ___ lost my keys.",options:["have","has","had","am"],correct:"have",explanation:"I have lost (résultat présent)."},
+    {q:"___ she called you?",options:["Have","Has","Did","Does"],correct:"Has",explanation:"Has pour she."},
+    {q:"We ___ already eaten.",options:["have","has","had","are"],correct:"have",explanation:"We have already (action faite)."},
+    {q:"It ___ rained a lot this month.",options:["have","has","had","is"],correct:"has",explanation:"It has rained (période en cours)."},
+    {q:"___ you seen my bag?",options:["Have","Has","Did","Do"],correct:"Have",explanation:"Have you seen (question PP)."},
+    {q:"She ___ visited London twice.",options:["have","has","had","is"],correct:"has",explanation:"Has visited (expérience)."},
+    {q:"I ___ not finished yet.",options:["have","has","had","am"],correct:"have",explanation:"Have not (négation PP)."},
+    {q:"___ they arrived?",options:["Have","Has","Did","Do"],correct:"Have",explanation:"Have they arrived (question PP)."},
+    {q:"He ___ worked here since 2020.",options:["have","has","had","is"],correct:"has",explanation:"Has worked since (depuis)."},
+    {q:"We ___ met before.",options:["have","has","had","are"],correct:"have",explanation:"We have met (expérience)."},
+    {q:"___ he ever been to Japan?",options:["Have","Has","Did","Does"],correct:"Has",explanation:"Has pour he."},
+    {q:"I ___ forgotten her name.",options:["have","has","had","am"],correct:"have",explanation:"I have forgotten."},
+    {q:"They ___ bought a new car.",options:["have","has","had","are"],correct:"have",explanation:"They have bought."},
+    {q:"She ___ not called me back.",options:["have","has","had","is"],correct:"has",explanation:"Has not (négation PP)."},
+    {q:"___ you finished your work?",options:["Have","Has","Did","Do"],correct:"Have",explanation:"Have you finished."}
+  ],
+  libre:[
+    {q:"I (never/be) ___ to Rome.",answer:"have never been",alternatives:["'ve never been"],explanation:"HAVE + NEVER + BEEN."},
+    {q:"She (finish) ___ her homework.",answer:"has finished",alternatives:["'s finished"],explanation:"HAS + participe passé."},
+    {q:"___ (have) you (eat) ___ sushi?",answer:"Have eaten",explanation:"HAVE + participe passé."},
+    {q:"They (live) ___ here for 10 years.",answer:"have lived",alternatives:["'ve lived"],explanation:"HAVE + participe passé (durée)."},
+    {q:"He (just/leave) ___.",answer:"has just left",alternatives:["'s just left"],explanation:"HAS + JUST + participe passé."},
+    {q:"I (lose) ___ my keys.",answer:"have lost",alternatives:["'ve lost"],explanation:"HAVE + participe passé."},
+    {q:"___ (have) she (call) ___ you?",answer:"Has called",explanation:"HAS + participe passé."},
+    {q:"We (already/eat) ___.",answer:"have already eaten",alternatives:["'ve already eaten"],explanation:"HAVE + ALREADY + participe passé."},
+    {q:"It (rain) ___ a lot this month.",answer:"has rained",alternatives:["'s rained"],explanation:"HAS + participe passé."},
+    {q:"___ (have) you (see) ___ my bag?",answer:"Have seen",explanation:"HAVE + participe passé."},
+    {q:"She (visit) ___ London twice.",answer:"has visited",alternatives:["'s visited"],explanation:"HAS + participe passé."},
+    {q:"I (not/finish) ___ yet.",answer:"have not finished",alternatives:["haven't finished"],explanation:"HAVE + NOT + participe passé."},
+    {q:"___ (have) they (arrive) ___?",answer:"Have arrived",explanation:"HAVE + participe passé."},
+    {q:"He (work) ___ here since 2020.",answer:"has worked",alternatives:["'s worked"],explanation:"HAS + participe passé (since)."},
+    {q:"We (meet) ___ before.",answer:"have met",alternatives:["'ve met"],explanation:"HAVE + participe passé."},
+    {q:"___ (have) he (be) ___ to Japan?",answer:"Has been",explanation:"HAS + BEEN."},
+    {q:"I (forget) ___ her name.",answer:"have forgotten",alternatives:["'ve forgotten"],explanation:"HAVE + participe passé."},
+    {q:"They (buy) ___ a new car.",answer:"have bought",alternatives:["'ve bought"],explanation:"HAVE + participe passé."},
+    {q:"She (not/call) ___ me back.",answer:"has not called",alternatives:["hasn't called"],explanation:"HAS + NOT + participe passé."},
+    {q:"___ (have) you (finish) ___ your work?",answer:"Have finished",explanation:"HAVE + participe passé."}
+  ]},
+  9:{title:"Pouvoirs magiques 🪄",objective:"Modaux (Can, Must, Should, Might)",
+  qcm:[
+    {q:"I ___ swim very well.",options:["can","must","should","will"],correct:"can",explanation:"Can = capacité / savoir-faire."},
+    {q:"You ___ stop smoking.",options:["can","must","should","will"],correct:"must",explanation:"Must = obligation forte."},
+    {q:"___ I borrow your pen?",options:["Can","Must","Should","Will"],correct:"Can",explanation:"Can = demande de permission (informel)."},
+    {q:"You ___ see a doctor.",options:["can","must","should","will"],correct:"should",explanation:"Should = conseil."},
+    {q:"He ___ be at home, I'm not sure.",options:["can","must","should","might"],correct:"might",explanation:"Might = possibilité faible."},
+    {q:"___ you speak French?",options:["Can","Must","Should","May"],correct:"Can",explanation:"Can = capacité."},
+    {q:"We ___ leave now or we'll miss the train.",options:["can","must","should","might"],correct:"must",explanation:"Must = nécessité."},
+    {q:"You ___ eat more vegetables.",options:["can","must","should","might"],correct:"should",explanation:"Should = conseil santé."},
+    {q:"It ___ rain later.",options:["can","must","should","might"],correct:"might",explanation:"Might = possibilité incertaine."},
+    {q:"I ___ help you with that.",options:["can","must","should","might"],correct:"can",explanation:"Can = offre d'aide."},
+    {q:"You ___ not enter. Private property.",options:["can","must","should","may"],correct:"must",explanation:"Must not = interdiction forte."},
+    {q:"___ I come in?",options:["Can","Must","Should","May"],correct:"May",explanation:"May = permission formelle."},
+    {q:"She ___ play the piano.",options:["can","must","should","might"],correct:"can",explanation:"Can = talent / capacité."},
+    {q:"You ___ be tired after all that work.",options:["can","must","should","might"],correct:"must",explanation:"Must = déduction logique."},
+    {q:"We ___ recycle more.",options:["can","must","should","might"],correct:"should",explanation:"Should = recommandation."},
+    {q:"He ___ be lost.",options:["can","must","should","might"],correct:"might",explanation:"Might = hypothèse."},
+    {q:"___ you help me carry this?",options:["Can","Must","Should","May"],correct:"Can",explanation:"Can = demande d'aide."},
+    {q:"I ___ finish this report today.",options:["can","must","should","might"],correct:"must",explanation:"Must = obligation."},
+    {q:"You ___ try this restaurant.",options:["can","must","should","might"],correct:"should",explanation:"Should = recommandation."},
+    {q:"It ___ be true, I don't know.",options:["can","must","should","might"],correct:"might",explanation:"Might = doute."}
+  ],
+  libre:[
+    {q:"I (pouvoir) ___ swim very well.",answer:"can",explanation:"Can = capacité."},
+    {q:"You (devoir) ___ stop smoking.",answer:"must",explanation:"Must = obligation."},
+    {q:"___ (can) I borrow your pen?",answer:"Can",explanation:"Can = permission."},
+    {q:"You (conseil) ___ see a doctor.",answer:"should",explanation:"Should = conseil."},
+    {q:"He (peut-être) ___ be at home.",answer:"might",explanation:"Might = possibilité faible."},
+    {q:"___ (can) you speak French?",answer:"Can",explanation:"Can = capacité."},
+    {q:"We (devoir) ___ leave now.",answer:"must",explanation:"Must = nécessité."},
+    {q:"You (conseil) ___ eat more vegetables.",answer:"should",explanation:"Should = conseil santé."},
+    {q:"It (peut-être) ___ rain later.",answer:"might",explanation:"Might = possibilité."},
+    {q:"I (pouvoir) ___ help you.",answer:"can",explanation:"Can = offre."},
+    {q:"You (interdiction) ___ not enter.",answer:"must",explanation:"Must not = interdiction."},
+    {q:"___ (may) I come in?",answer:"May",explanation:"May = permission formelle."},
+    {q:"She (pouvoir) ___ play piano.",answer:"can",explanation:"Can = talent."},
+    {q:"You (déduction) ___ be tired.",answer:"must",explanation:"Must = déduction."},
+    {q:"We (conseil) ___ recycle more.",answer:"should",explanation:"Should = recommandation."},
+    {q:"He (hypothèse) ___ be lost.",answer:"might",explanation:"Might = hypothèse."},
+    {q:"___ (can) you help me?",answer:"Can",explanation:"Can = demande."},
+    {q:"I (obligation) ___ finish today.",answer:"must",explanation:"Must = obligation."},
+    {q:"You (conseil) ___ try this restaurant.",answer:"should",explanation:"Should = recommandation."},
+    {q:"It (doute) ___ be true.",answer:"might",explanation:"Might = doute."}
+  ]},
+  10:{title:"Maîtrise totale 👑",objective:"Phrases complexes (If, Although, Because…)",
+  qcm:[
+    {q:"If it rains, I ___ at home.",options:["stay","will stay","stayed","staying"],correct:"will stay",explanation:"1er conditionnel: IF + présent, WILL + infinitif."},
+    {q:"If I ___ you, I would apologize.",options:["am","was","were","be"],correct:"were",explanation:"2ème conditionnel: IF + WERE (toutes personnes)."},
+    {q:"I won't go ___ you come with me.",options:["if","unless","although","because"],correct:"unless",explanation:"Unless = if not (sauf si)."},
+    {q:"___ it is raining, we are going out.",options:["If","Unless","Although","Because"],correct:"Although",explanation:"Although = bien que (concession)."},
+    {q:"She is late ___ the traffic was bad.",options:["if","unless","although","because"],correct:"because",explanation:"Because = cause."},
+    {q:"If he ___ harder, he would pass.",options:["study","studies","studied","studying"],correct:"studied",explanation:"2ème conditionnel: IF + prétérit."},
+    {q:"___ you heat water, it boils.",options:["If","Unless","Although","Because"],correct:"If",explanation:"Vérité générale = IF + présent."},
+    {q:"I will call you ___ I arrive.",options:["if","unless","although","as soon as"],correct:"as soon as",explanation:"As soon as = dès que."},
+    {q:"___ she is rich, she is not happy.",options:["If","Unless","Although","Because"],correct:"Although",explanation:"Although = concession (contraste)."},
+    {q:"If they ___ earlier, they won't be late.",options:["leave","leaves","left","leaving"],correct:"leave",explanation:"1er conditionnel: IF + présent."},
+    {q:"I can't help you ___ you tell me.",options:["if","unless","although","because"],correct:"unless",explanation:"Unless = condition négative."},
+    {q:"He failed the exam ___ he didn't study.",options:["if","unless","although","because"],correct:"because",explanation:"Because = cause."},
+    {q:"If I ___ a million euros, I would buy a house.",options:["have","has","had","having"],correct:"had",explanation:"2ème conditionnel: IF + prétérit."},
+    {q:"___ you don't hurry, you'll miss the bus.",options:["If","Unless","Although","Because"],correct:"If",explanation:"If = condition (avertissement)."},
+    {q:"She went to work ___ she was sick.",options:["if","unless","although","because"],correct:"although",explanation:"Although = malgré (concession)."},
+    {q:"We will stay home ___ it stops raining.",options:["if","unless","until","because"],correct:"until",explanation:"Until = jusqu'à ce que."},
+    {q:"If he ___ here, he would help us.",options:["is","was","were","be"],correct:"were",explanation:"2ème conditionnel: IF + WERE."},
+    {q:"___ I am very busy, I will help you.",options:["If","Unless","Although","Because"],correct:"Although",explanation:"Although = malgré le fait que."},
+    {q:"She cried ___ she was so happy.",options:["if","unless","although","because"],correct:"because",explanation:"Because = cause de l'émotion."},
+    {q:"___ you see him, tell him to call me.",options:["If","Unless","Although","Because"],correct:"If",explanation:"If = condition (instruction)."}
+  ],
+  libre:[
+    {q:"If it rains, I (stay) ___ home.",answer:"will stay",explanation:"IF + présent, WILL + infinitif."},
+    {q:"If I (be) ___ you, I would say yes.",answer:"were",explanation:"IF + WERE (2ème conditionnel)."},
+    {q:"I won't go ___ you come.",answer:"unless",explanation:"Unless = sauf si."},
+    {q:"___ it is raining, we go out.",answer:"Although",explanation:"Although = bien que."},
+    {q:"She is late ___ the traffic was bad.",answer:"because",explanation:"Because = cause."},
+    {q:"If he (study) ___ harder, he would pass.",answer:"studied",explanation:"IF + prétérit (2ème conditionnel)."},
+    {q:"___ you heat water, it boils.",answer:"If",explanation:"Vérité générale."},
+    {q:"I will call you ___ I arrive.",answer:"as soon as",explanation:"As soon as = dès que."},
+    {q:"___ she is rich, she is not happy.",answer:"Although",explanation:"Concession."},
+    {q:"If they (leave) ___ earlier, they won't be late.",answer:"leave",explanation:"IF + présent (1er conditionnel)."},
+    {q:"I can't help you ___ you tell me.",answer:"unless",explanation:"Unless = condition négative."},
+    {q:"He failed ___ he didn't study.",answer:"because",explanation:"Because = cause."},
+    {q:"If I (have) ___ a million euros...",answer:"had",explanation:"IF + prétérit (2ème conditionnel)."},
+    {q:"___ you don't hurry, you'll miss it.",answer:"If",explanation:"Condition / avertissement."},
+    {q:"She went to work ___ she was sick.",answer:"although",explanation:"Although = malgré."},
+    {q:"We stay home ___ it stops.",answer:"until",explanation:"Until = jusqu'à ce que."},
+    {q:"If he (be) ___ here, he would help.",answer:"were",explanation:"IF + WERE."},
+    {q:"___ I am busy, I will help.",answer:"Although",explanation:"Concession."},
+    {q:"She cried ___ she was happy.",answer:"because",explanation:"Cause de l'émotion."},
+    {q:"___ you see him, tell him.",answer:"If",explanation:"Condition (instruction)."}
+  ]}
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// ÉTAT DU JEU
+// ═══════════════════════════════════════════════════════════════════
+let gameState = {
+  currentPlayer:null, currentLevel:1, currentMode:"mixte",
+  questions:[], currentQuestionIndex:0, score:0, answers:[], selectedOption:null
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// GESTION JOUEURS
+// ═══════════════════════════════════════════════════════════════════
+function getPlayers(){try{return JSON.parse(localStorage.getItem(SUBJECT_CONFIG.playersKey))||{};}catch(e){return {};}}
+function savePlayers(p){localStorage.setItem(SUBJECT_CONFIG.playersKey,JSON.stringify(p));}
+function getPlayerData(name){
+  const p=getPlayers();
+  if(!p[name])p[name]={name,currentLevel:1,score:0,completed:[],totalQuestions:0,totalCorrect:0,streak:0,lastPlayed:null,errorHistory:[]};
+  savePlayers(p); return p[name];
+}
+function switchPlayer(name){
+  if(!name)return;
+  gameState.currentPlayer=name;
+  const p=getPlayerData(name);
+  gameState.currentLevel=p.currentLevel||1;
+  gameState.score=p.score||0;
+  updatePlayerDisplay(); renderLevels(); showToast("Joueur : "+name);
+}
+function createNewPlayer(){
+  const name=prompt("Nom du joueur (prénom) :");
+  if(!name||!name.trim()){return;}
+  const n=name.trim();
+  const players=getPlayers();
+  if(players[n]){alert("Ce joueur existe déjà !");return;}
+  players[n]={name:n,currentLevel:1,score:0,completed:[],totalQuestions:0,totalCorrect:0,streak:0,lastPlayed:null,errorHistory:[]};
+  savePlayers(players); switchPlayer(n);
+}
+function deleteCurrentPlayer(){
+  if(!gameState.currentPlayer){showToast("Aucun joueur sélectionné");return;}
+  if(!confirm("Supprimer "+gameState.currentPlayer+" ? Toute sa progression sera perdue."))return;
+  const p=getPlayers(); delete p[gameState.currentPlayer]; savePlayers(p);
+  gameState.currentPlayer=null; updatePlayerDisplay(); renderLevels(); showToast("Joueur supprimé");
+}
+function updatePlayerDisplay(){
+  const players=getPlayers();
+  const sel=document.getElementById("playerSelect");
+  sel.innerHTML="<option value=''>-- Joueur --</option>";
+  Object.keys(players).forEach(n=>{
+    const o=document.createElement("option"); o.value=n;
+    o.textContent=n+" (Niv."+players[n].currentLevel+")";
+    if(n===gameState.currentPlayer)o.selected=true;
+    sel.appendChild(o);
+  });
+  if(gameState.currentPlayer&&players[gameState.currentPlayer]){
+    const p=players[gameState.currentPlayer];
+    document.getElementById("playerNameDisplay").textContent=p.name;
+    document.getElementById("playerAvatar").textContent=p.name.charAt(0).toUpperCase();
+    document.getElementById("playerStats").textContent="Niv."+p.currentLevel+" • "+p.score+" pts";
+    document.getElementById("headerScore").textContent=p.score+" pts";
+    document.getElementById("homeLevel").textContent=p.currentLevel;
+    document.getElementById("homeScore").textContent=p.score;
+    document.getElementById("homeStreak").textContent=p.streak||0;
+    const rate=p.totalQuestions>0?Math.round((p.totalCorrect/p.totalQuestions)*100):0;
+    document.getElementById("homeRate").textContent=rate+"%";
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════════
+function showSection(id){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  if(id==="niveaux")renderLevels();
+  if(id==="accueil")updatePlayerDisplay();
+  if(id==="lecons")renderLessons();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// LEÇONS
+// ═══════════════════════════════════════════════════════════════════
+function renderLessons(){
+  const c=document.getElementById("lessonsContainer");
+  c.innerHTML=LESSONS_DATA.map(l=>`
+    <div class="lesson-card" onclick="toggleLesson(${l.num})">
+      <div class="lesson-header">
+        <div class="lesson-title">📘 Leçon ${l.num} — ${l.title}</div>
+        <span class="lesson-tag" id="lessonTag${l.num}">▼ ouvrir</span>
+      </div>
+      <div class="lesson-body" id="lessonBody${l.num}">${l.content}</div>
+    </div>`).join("");
+}
+function toggleLesson(num){
+  const body=document.getElementById("lessonBody"+num);
+  const tag=document.getElementById("lessonTag"+num);
+  const card=body.parentElement;
+  const open=body.classList.contains("open");
+  body.classList.toggle("open",!open);
+  card.classList.toggle("open",!open);
+  tag.textContent=open?"▼ ouvrir":"▲ fermer";
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// NIVEAUX
+// ═══════════════════════════════════════════════════════════════════
+function selectMode(mode){
+  gameState.currentMode=mode;
+  document.querySelectorAll(".mode-btn").forEach(b=>b.classList.remove("selected"));
+  document.getElementById("btn"+mode.charAt(0).toUpperCase()+mode.slice(1)).classList.add("selected");
+}
+function renderLevels(){
+  const c=document.getElementById("levelsContainer");
+  const players=getPlayers();
+  const p=gameState.currentPlayer?players[gameState.currentPlayer]:null;
+  const currentLvl=p?p.currentLevel:1;
+  const completed=p?(p.completed||[]):[];
+  let h="";
+  for(let i=1;i<=10;i++){
+    const lv=QUESTIONS_DB[i];
+    const isLocked=i>currentLvl&&!completed.includes(i);
+    const isDone=completed.includes(i);
+    const isCurrent=i===currentLvl;
+    let cls="level-card"; let statusIcon="▶️";
+    if(isLocked){cls+=" locked";statusIcon="🔒";}
+    else if(isDone){cls+=" completed";statusIcon="✅";}
+    else if(isCurrent){cls+=" current";statusIcon="🎯";}
+    h+=`<div class="${cls}" onclick="${isLocked?"":"startLevel("+i+")"}">
+      <div class="level-header"><span class="level-number">Niveau ${i}</span><span>${statusIcon}</span></div>
+      <div class="level-title">${lv.title}</div>
+      <div class="level-obj">${lv.objective}</div>
+      <div style="font-size:.75em;color:#718096;margin-top:8px">${isDone?"Terminé ✓":isLocked?"Verrouillé":"40 questions disponibles"}</div>
+    </div>`;
+  }
+  c.innerHTML=h;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// JEU
+// ═══════════════════════════════════════════════════════════════════
+function startLevel(levelNum){
+  if(!gameState.currentPlayer){showToast("Crée ou choisis un joueur d'abord !");return;}
+  gameState.currentLevel=levelNum;
+  gameState.currentQuestionIndex=0; gameState.answers=[]; gameState.selectedOption=null;
+  const lv=QUESTIONS_DB[levelNum];
+  const allQcm=lv.qcm.map(q=>({...q,type:"qcm"}));
+  const allLibre=lv.libre.map(q=>({...q,type:"libre"}));
+  const mode=gameState.currentMode;
+  if(mode==="qcm") gameState.questions=shuffle(allQcm).slice(0,10);
+  else if(mode==="libre") gameState.questions=shuffle(allLibre).slice(0,10);
+  else gameState.questions=shuffle([...shuffle(allQcm).slice(0,5),...shuffle(allLibre).slice(0,5)]);
+  document.getElementById("gameTitle").textContent="Niveau "+levelNum+" : "+lv.title;
+  showSection("jeu"); renderQuestion();
+}
+function shuffle(a){
+  const arr=[...a];
+  for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+  return arr;
+}
+function renderQuestion(){
+  const q=gameState.questions[gameState.currentQuestionIndex];
+  const total=gameState.questions.length;
+  const idx=gameState.currentQuestionIndex;
+  document.getElementById("questionCounter").textContent="Q"+(idx+1)+"/"+total;
+  document.getElementById("scoreDisplay").textContent=gameState.answers.filter(a=>a.isCorrect).length+" ✓";
+  document.getElementById("progressFill").style.width=(idx/total*100)+"%";
+  document.getElementById("questionNum").textContent=(idx+1)+". "+q.type.toUpperCase();
+  document.getElementById("questionText").textContent=q.q;
+  document.getElementById("feedback").style.display="none";
+  document.getElementById("feedback").className="feedback";
+  document.getElementById("validateBtn").style.display="inline-block";
+  document.getElementById("nextBtn").style.display="none";
+  gameState.selectedOption=null;
+  if(q.type==="qcm"){
+    document.getElementById("qcmOptions").style.display="grid";
+    document.getElementById("libreInput").style.display="none";
+    const g=document.getElementById("qcmOptions");
+    g.innerHTML=q.options.map(opt=>`<button class="option-btn" onclick="selectOption(this,'${opt.replace(/'/g,"\'")}')">　${opt}</button>`).join("");
+  } else {
+    document.getElementById("qcmOptions").style.display="none";
+    document.getElementById("libreInput").style.display="block";
+    const inp=document.getElementById("answerInput");
+    inp.value=""; inp.className="answer-input"; inp.disabled=false;
+    setTimeout(()=>inp.focus(),100);
+  }
+}
+function selectOption(btn,val){
+  document.querySelectorAll(".option-btn").forEach(b=>b.classList.remove("selected"));
+  btn.classList.add("selected"); gameState.selectedOption=val;
+}
+function validateAnswer(){
+  const q=gameState.questions[gameState.currentQuestionIndex];
+  let isCorrect=false; let userAnswer="";
+  if(q.type==="qcm"){
+    if(!gameState.selectedOption){showToast("Choisis une réponse !");return;}
+    userAnswer=gameState.selectedOption;
+    isCorrect=userAnswer===q.correct;
+    document.querySelectorAll(".option-btn").forEach(btn=>{
+      btn.disabled=true;
+      const v=btn.textContent.trim();
+      if(v===q.correct)btn.classList.add("correct");
+      else if(v===gameState.selectedOption&&!isCorrect)btn.classList.add("wrong");
+    });
+  } else {
+    const inp=document.getElementById("answerInput");
+    userAnswer=inp.value.trim();
+    if(!userAnswer){showToast("Écris ta réponse !");return;}
+    const clean=userAnswer.toLowerCase().replace(/[.,;:!?']/g,"");
+    const cc=q.answer.toLowerCase().replace(/[.,;:!?']/g,"");
+    isCorrect=clean===cc;
+    if(!isCorrect&&q.alternatives){
+      isCorrect=q.alternatives.some(a=>clean===a.toLowerCase().replace(/[.,;:!?']/g,""));
+    }
+    inp.disabled=true; inp.className="answer-input "+(isCorrect?"correct":"wrong");
+  }
+  // Feedback
+  const fb=document.getElementById("feedback");
+  fb.style.display="block";
+  fb.className="feedback show "+(isCorrect?"correct-fb":"wrong-fb");
+  document.getElementById("feedbackTitle").textContent=isCorrect?"✅ Bonne réponse !":"❌ Pas tout à fait…";
+  document.getElementById("feedbackCorrect").textContent=isCorrect?"":"Bonne réponse : "+(q.correct||q.answer);
+  document.getElementById("feedbackExplanation").textContent=q.explanation||"";
+  // Stats
+  gameState.answers.push({question:q.q,userAnswer,correct:q.correct||q.answer,isCorrect,explanation:q.explanation});
+  if(isCorrect) gameState.score+=10; else trackError(q,userAnswer);
+  const players=getPlayers();
+  if(gameState.currentPlayer&&players[gameState.currentPlayer]){
+    const pp=players[gameState.currentPlayer];
+    pp.totalQuestions=(pp.totalQuestions||0)+1;
+    if(isCorrect)pp.totalCorrect=(pp.totalCorrect||0)+1;
+    if(isCorrect)pp.streak=(pp.streak||0)+1; else pp.streak=0;
+    savePlayers(players);
+  }
+  document.getElementById("validateBtn").style.display="none";
+  document.getElementById("nextBtn").style.display="inline-block";
+  document.getElementById("nextBtn").textContent=
+    gameState.currentQuestionIndex===gameState.questions.length-1?"Voir les résultats →":"Suivant →";
+}
+function trackError(question,userAnswer){
+  if(!gameState.currentPlayer)return;
+  const players=getPlayers();
+  const p=players[gameState.currentPlayer];
+  if(!p.errorHistory)p.errorHistory=[];
+  p.errorHistory.push({question:question.q,userAnswer,correctAnswer:question.correct||question.answer,explanation:question.explanation,date:new Date().toISOString(),level:gameState.currentLevel});
+  if(p.errorHistory.length>50)p.errorHistory=p.errorHistory.slice(-50);
+  savePlayers(players);
+}
+function nextQuestion(){
+  if(gameState.currentQuestionIndex>=gameState.questions.length-1) showResults();
+  else{gameState.currentQuestionIndex++; renderQuestion();}
+}
+function showResults(){
+  const total=gameState.questions.length;
+  const correct=gameState.answers.filter(a=>a.isCorrect).length;
+  const pct=Math.round(correct/total*100);
+  document.getElementById("resultPct").textContent=pct+"%";
+  const msg=pct>=80?"🎉 Excellent ! Niveau suivant débloqué !":pct>=50?"👍 Pas mal ! Continue à t'entraîner.":"💪 Courage ! Relis la leçon et réessaie !";
+  document.getElementById("resultMsg").textContent=msg+" ("+correct+"/"+total+" bonnes réponses)";
+  const players=getPlayers();
+  const p=players[gameState.currentPlayer];
+  if(pct>=80&&p){
+    if(!p.completed.includes(gameState.currentLevel))p.completed.push(gameState.currentLevel);
+    if(p.currentLevel<=gameState.currentLevel&&gameState.currentLevel<10)p.currentLevel=gameState.currentLevel+1;
+    p.score=(p.score||0)+correct*10;
+    savePlayers(players);
+    document.getElementById("nextLevelBtn").style.display="inline-block";
+  } else document.getElementById("nextLevelBtn").style.display="none";
+  updatePlayerDisplay(); showSection("resultats");
+}
+function retryLevel(){startLevel(gameState.currentLevel);}
+function startNextLevel(){
+  const players=getPlayers();
+  const nlvl=players[gameState.currentPlayer]?players[gameState.currentPlayer].currentLevel:1;
+  if(nlvl<=10)startLevel(nlvl); else showToast("Félicitations ! Tu as tout terminé ! 🏆");
+}
+function quitGame(){
+  if(confirm("Quitter ? Ta progression dans ce niveau sera perdue."))showSection("niveaux");
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════════
+function showToast(msg){
+  const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),3000);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════
+document.addEventListener("DOMContentLoaded",()=>{
+  renderLessons(); renderLevels(); updatePlayerDisplay();
+  const players=getPlayers(); const names=Object.keys(players);
+  if(names.length>0)switchPlayer(names[0]);
+});
+</script>
+</body>
+</html>

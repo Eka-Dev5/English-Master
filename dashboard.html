@@ -1,12 +1,333 @@
-{
-  "always_run_in_app" : false,
-  "icon" : {
-    "color" : "blue",
-    "glyph" : "magic"
-  },
-  "name" : "dashboard.html",
-  "script" : "<!DOCTYPE html>\n\n<html lang=\"fr\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>English Master — Mon Espace<\/title>\n<style>\n:root{--primary:#667eea;--secondary:#764ba2;--success:#48bb78;--error:#f56565;--warning:#ed8936;--gold:#ffd700}\n*{box-sizing:border-box;margin:0;padding:0;font-family:\"Segoe UI\",system-ui,sans-serif}\nbody{background:linear-gradient(135deg,var(--primary),var(--secondary));min-height:100vh;padding:15px}\n.container{max-width:1000px;margin:0 auto;background:white;border-radius:20px;padding:25px;box-shadow:0 20px 60px rgba(0,0,0,.3)}\nh1{text-align:center;color:var(--primary);font-size:2.1em;margin-bottom:4px}\n.subtitle{text-align:center;color:#718096;margin-bottom:20px}\n.nav-tabs{display:flex;gap:8px;margin-bottom:22px;border-bottom:2px solid #e2e8f0;padding-bottom:10px;flex-wrap:wrap;align-items:center}\n.tab-btn{padding:10px 18px;border:none;background:#f0f0f0;border-radius:20px;cursor:pointer;font-weight:bold;transition:all .25s;white-space:nowrap;font-size:.9em}\n.tab-btn:hover,.tab-btn.active{background:var(--primary);color:white}\n.tab-content{display:none}\n.tab-content.active{display:block;animation:fadeIn .3s}\n@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}\n\n\/* STATS *\/\n.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:25px}\n.stat-card{background:linear-gradient(145deg,var(–primary),var(–secondary));color:white;padding:20px;border-radius:15px;text-align:center}\n.stat-num{font-size:2.3em;font-weight:800;display:block}\n.stat-label{font-size:.8em;opacity:.9;text-transform:uppercase;letter-spacing:.5px}\n.level-progress{margin-top:20px}\n.level-progress h3{margin-bottom:12px;color:#2d3748}\n.level-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:.9em}\n.level-row-label{width:100px;color:#4a5568;font-weight:600;flex-shrink:0}\n.progress-bar{flex:1;height:14px;background:#e2e8f0;border-radius:7px;overflow:hidden}\n.progress-fill{height:100%;background:linear-gradient(90deg,var(–success),#68d391);border-radius:7px;transition:width .6s}\n.progress-fill.locked{background:#e2e8f0}\n.level-row-pct{width:38px;text-align:right;color:#718096;font-size:.85em}\n\n\/* BADGES *\/\n.badges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:10px}\n.badge{background:#f5f7fa;border:2px solid #e2e8f0;border-radius:14px;padding:14px;text-align:center;opacity:.45;filter:grayscale(1);transition:all .3s}\n.badge.unlocked{opacity:1;filter:none;border-color:var(–gold);background:linear-gradient(145deg,#fff9e6,#fff3cd);box-shadow:0 4px 15px rgba(255,215,0,.25)}\n.badge-icon{font-size:2.4em;margin-bottom:6px;display:block}\n.badge-name{font-weight:bold;font-size:.85em;color:#2d3748;margin-bottom:3px}\n.badge-desc{font-size:.72em;color:#718096}\n\n\/* CAMÉLÉON *\/\n.cam-box{background:#e8f4ff;border-radius:15px;padding:22px}\n.cam-avatar{text-align:center;font-size:4em;margin-bottom:10px}\n.cam-name{text-align:center;font-weight:bold;color:var(–secondary);margin-bottom:14px}\n.cam-bubble{background:white;border:2px dashed var(–error);border-radius:12px;padding:16px;margin-bottom:16px;font-size:1.1em;font-family:monospace;color:#c53030;text-align:center}\n.cam-instruction{font-weight:bold;color:#2d3748;margin-bottom:12px;text-align:center}\n.cam-options{display:grid;gap:10px}\n.cam-btn{padding:13px;border:2px solid #c6d3f7;background:white;border-radius:10px;cursor:pointer;font-size:.95em;text-align:left;transition:all .2s}\n.cam-btn:hover{border-color:var(–primary);background:#f0f4ff}\n.cam-btn.correct{background:#c6f6d5;border-color:var(–success);color:#276749}\n.cam-btn.wrong{background:#fed7d7;border-color:var(–error);color:#c53030}\n.cam-btn:disabled{cursor:not-allowed}\n.cam-score{text-align:center;margin-top:14px;font-weight:bold;color:var(–secondary)}\n.cam-no-errors{text-align:center;color:#718096;padding:30px}\n\n\/* FICHES *\/\n.fiche-card{background:white;border-left:4px solid var(–primary);padding:16px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.07);margin-bottom:12px}\n.fiche-q{font-weight:bold;color:#2d3748;margin-bottom:6px}\n.fiche-wrong{color:var(–error);text-decoration:line-through;font-size:.95em}\n.fiche-correct{color:var(–success);font-weight:bold;font-size:.95em}\n.fiche-expl{color:#718096;font-size:.85em;margin-top:5px;font-style:italic}\n.print-btn{background:var(–primary);color:white;border:none;padding:10px 22px;border-radius:20px;cursor:pointer;font-weight:bold;margin-bottom:16px;display:block}\n\n\/* PLAYER SELECT *\/\n.player-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}\n.player-header select{padding:8px 12px;border:2px solid #e2e8f0;border-radius:10px;font-size:.95em;flex:1;min-width:150px}\n.btn{padding:9px 18px;border:none;border-radius:10px;cursor:pointer;font-weight:bold;font-size:.9em;transition:all .2s}\n.btn-primary{background:linear-gradient(135deg,var(–primary),var(–secondary));color:white}\n.btn-link{background:#f0f4ff;color:var(–primary)}\n\n.no-print-info{background:#f0fff4;border-left:4px solid var(–success);padding:10px 14px;border-radius:0 8px 8px 0;font-size:.85em;color:#276749;margin-bottom:16px}\n@media print{.nav-tabs,.player-header,.print-btn,.no-print{display:none}}\n@media(max-width:600px){.stats-grid{grid-template-columns:repeat(2,1fr)}.badges-grid{grid-template-columns:repeat(3,1fr)}}\n<\/style>\n\n<\/head>\n<body>\n<div class=\"container\">\n<h1>📊 Mon Espace English Master<\/h1>\n<div class=\"subtitle\">Tous tes progrès, badges et révisions en un coup d'œil<\/div>\n\n<div class=\"player-header no-print\">\n  <select id=\"playerSelect\" onchange=\"loadPlayer(this.value)\"><option value=\"\">-- Choisir un joueur --<\/option><\/select>\n  <button class=\"btn btn-primary\" onclick=\"window.location.href='quiz.html'\">↩ Retour au Quiz<\/button>\n  <button class=\"btn btn-link\" onclick=\"window.open('lexique.html','_blank')\">📖 Lexique<\/button>\n<\/div>\n\n<div class=\"nav-tabs\">\n  <button class=\"tab-btn active\" onclick=\"showTab('stats',this)\">📈 Statistiques<\/button>\n  <button class=\"tab-btn\" onclick=\"showTab('badges',this)\">🏅 Badges (<span id=\"badgeCount\">0<\/span>\/30)<\/button>\n  <button class=\"tab-btn\" onclick=\"showTab('cameleon',this)\">🎭 Mode Caméléon<\/button>\n  <button class=\"tab-btn\" onclick=\"showTab('fiches',this)\">📝 Mes Fiches<\/button>\n<\/div>\n\n<!-- STATS -->\n\n<div id=\"stats\" class=\"tab-content active\">\n  <div class=\"stats-grid\">\n    <div class=\"stat-card\"><span class=\"stat-num\" id=\"statLevel\">1<\/span><span class=\"stat-label\">Niveau actuel<\/span><\/div>\n    <div class=\"stat-card\"><span class=\"stat-num\" id=\"statScore\">0<\/span><span class=\"stat-label\">Points totaux<\/span><\/div>\n    <div class=\"stat-card\"><span class=\"stat-num\" id=\"statStreak\">0<\/span><span class=\"stat-label\">Série 🔥<\/span><\/div>\n    <div class=\"stat-card\"><span class=\"stat-num\" id=\"statRate\">0%<\/span><span class=\"stat-label\">Précision<\/span><\/div>\n  <\/div>\n  <div class=\"level-progress\">\n    <h3>📚 Progression par niveau<\/h3>\n    <div id=\"levelBars\"><\/div>\n  <\/div>\n<\/div>\n\n<!-- BADGES -->\n\n<div id=\"badges\" class=\"tab-content\">\n  <div class=\"no-print-info\">Les badges se débloquent automatiquement selon ta progression dans le quiz.<\/div>\n  <div class=\"badges-grid\" id=\"badgesGrid\"><\/div>\n<\/div>\n\n<!-- CAMÉLÉON -->\n\n<div id=\"cameleon\" class=\"tab-content\">\n  <div class=\"cam-box\">\n    <div class=\"cam-avatar\">🦎<\/div>\n    <div class=\"cam-name\">Mode Caméléon — Aide Lucas !<\/div>\n    <div id=\"cameleonContent\"><\/div>\n    <div class=\"cam-score\" id=\"camScore\"><\/div>\n  <\/div>\n<\/div>\n\n<!-- FICHES -->\n\n<div id=\"fiches\" class=\"tab-content\">\n  <button class=\"print-btn no-print\" onclick=\"window.print()\">🖨️ Imprimer mes fiches<\/button>\n  <div id=\"fichesContent\"><\/div>\n<\/div>\n<\/div>\n\n<script>\nconst STORAGE_KEY = \"englishMaster_v4\";\nconst PLAYERS_KEY = \"englishMaster_players\";\n\nconst LEVEL_NAMES = {\n  1:\"Décollage 🚀\",2:\"Routine 📅\",3:\"En ce moment 👁️\",4:\"Questions ❓\",5:\"Retour ⏪\",\n  6:\"Aventurier ⚔️\",7:\"Voyant 🔮\",8:\"Expériences 🏆\",9:\"Pouvoirs 🪄\",10:\"Maîtrise 👑\"\n};\n\nconst BADGES_DEF = [\n  {id:1,icon:\"🚀\",name:\"Premier Pas\",desc:\"Terminer le niveau 1\",check:p=>p.completed&&p.completed.includes(1)},\n  {id:2,icon:\"📅\",name:\"Routinier\",desc:\"Terminer le niveau 2\",check:p=>p.completed&&p.completed.includes(2)},\n  {id:3,icon:\"👁️\",name:\"Observateur\",desc:\"Terminer le niveau 3\",check:p=>p.completed&&p.completed.includes(3)},\n  {id:4,icon:\"❓\",name:\"Questionneur\",desc:\"Terminer le niveau 4\",check:p=>p.completed&&p.completed.includes(4)},\n  {id:5,icon:\"⏪\",name:\"Archiviste\",desc:\"Terminer le niveau 5\",check:p=>p.completed&&p.completed.includes(5)},\n  {id:6,icon:\"⚔️\",name:\"Aventurier\",desc:\"Terminer le niveau 6\",check:p=>p.completed&&p.completed.includes(6)},\n  {id:7,icon:\"🔮\",name:\"Voyant\",desc:\"Terminer le niveau 7\",check:p=>p.completed&&p.completed.includes(7)},\n  {id:8,icon:\"🏆\",name:\"Champion\",desc:\"Terminer le niveau 8\",check:p=>p.completed&&p.completed.includes(8)},\n  {id:9,icon:\"🪄\",name:\"Magicien\",desc:\"Terminer le niveau 9\",check:p=>p.completed&&p.completed.includes(9)},\n  {id:10,icon:\"👑\",name:\"English Master\",desc:\"Terminer le niveau 10\",check:p=>p.completed&&p.completed.includes(10)},\n  {id:11,icon:\"🎯\",name:\"Sniper\",desc:\"Avoir 100% à un niveau\",check:p=>false},\n  {id:12,icon:\"🔥\",name:\"En feu !\",desc:\"Série de 10 bonnes réponses\",check:p=>(p.streak||0)>=10},\n  {id:13,icon:\"⚡\",name:\"Éclair\",desc:\"Série de 20 bonnes réponses\",check:p=>(p.streak||0)>=20},\n  {id:14,icon:\"💎\",name:\"Diamant\",desc:\"Dépasser 500 points\",check:p=>(p.score||0)>=500},\n  {id:15,icon:\"🌟\",name:\"Étoile\",desc:\"Dépasser 1000 points\",check:p=>(p.score||0)>=1000},\n  {id:16,icon:\"🌈\",name:\"Arc-en-ciel\",desc:\"Dépasser 2000 points\",check:p=>(p.score||0)>=2000},\n  {id:17,icon:\"📝\",name:\"Scripteur\",desc:\"Répondre à 50 questions\",check:p=>(p.totalQuestions||0)>=50},\n  {id:18,icon:\"📚\",name:\"Bosseur\",desc:\"Répondre à 100 questions\",check:p=>(p.totalQuestions||0)>=100},\n  {id:19,icon:\"🧠\",name:\"Génie\",desc:\"Répondre à 200 questions\",check:p=>(p.totalQuestions||0)>=200},\n  {id:20,icon:\"✅\",name:\"Précis\",desc:\"80% de bonnes réponses sur 20 questions\",check:p=>p.totalQuestions>=20&&((p.totalCorrect||0)\/p.totalQuestions)>=0.8},\n  {id:21,icon:\"🦅\",name:\"Aigle\",desc:\"90% de bonnes réponses sur 50 questions\",check:p=>p.totalQuestions>=50&&((p.totalCorrect||0)\/p.totalQuestions)>=0.9},\n  {id:22,icon:\"🏅\",name:\"Médaillé\",desc:\"5 niveaux terminés\",check:p=>(p.completed||[]).length>=5},\n  {id:23,icon:\"🎓\",name:\"Diplômé\",desc:\"8 niveaux terminés\",check:p=>(p.completed||[]).length>=8},\n  {id:24,icon:\"🦁\",name:\"Courageux\",desc:\"Rejouer après une erreur\",check:p=>(p.totalQuestions||0)>=2},\n  {id:25,icon:\"🔁\",name:\"Persévérant\",desc:\"Revenir sur ses erreurs\",check:p=>(p.errorHistory||[]).length>0},\n  {id:26,icon:\"🎭\",name:\"Ami de Lucas\",desc:\"Aider Lucas 1 fois\",check:p=>(p.cameleonHelped||0)>=1},\n  {id:27,icon:\"👨‍🏫\",name:\"Professeur\",desc:\"Aider Lucas 5 fois\",check:p=>(p.cameleonHelped||0)>=5},\n  {id:28,icon:\"🧑‍🎓\",name:\"Maître\",desc:\"Aider Lucas 10 fois\",check:p=>(p.cameleonHelped||0)>=10},\n  {id:29,icon:\"🌍\",name:\"Citoyen du monde\",desc:\"Tous les niveaux terminés\",check:p=>(p.completed||[]).length>=10},\n  {id:30,icon:\"🏆\",name:\"Légendaire\",desc:\"2000+ pts + tous niveaux terminés\",check:p=>(p.score||0)>=2000&&(p.completed||[]).length>=10}\n];\n\nconst CAMELEON_EXERCISES = [\n  {error:\"I is a student.\",correct:\"I am a student.\",rule:\"Avec 'I', to be = AM (pas IS).\",options:[\"I am a student.\",\"I is a student.\",\"I are a student.\",\"I be a student.\"]},\n  {error:\"She don't like cats.\",correct:\"She doesn't like cats.\",rule:\"She\/He\/It + doesn't (pas don't).\",options:[\"She don't like cats.\",\"She doesn't like cats.\",\"She not like cats.\",\"She isn't like cats.\"]},\n  {error:\"He play football every day.\",correct:\"He plays football every day.\",rule:\"He\/She\/It + verbe + S au présent simple.\",options:[\"He play football.\",\"He plays football.\",\"He playing football.\",\"He is play football.\"]},\n  {error:\"Look! The cat sleep on the sofa.\",correct:\"Look! The cat is sleeping on the sofa.\",rule:\"Look! = action en cours = BE + -ING.\",options:[\"The cat sleep.\",\"The cat sleeping.\",\"The cat is sleeping.\",\"The cat sleeps.\"]},\n  {error:\"I have 10 years.\",correct:\"I am 10 years old.\",rule:\"L'âge se dit avec TO BE (pas TO HAVE) en anglais !\",options:[\"I have 10 years.\",\"I am 10 years old.\",\"I has 10 years.\",\"I is 10 years.\"]},\n  {error:\"Yesterday I go to school.\",correct:\"Yesterday I went to school.\",rule:\"Yesterday = passé. GO → WENT (irrégulier).\",options:[\"Yesterday I go.\",\"Yesterday I goes.\",\"Yesterday I went.\",\"Yesterday I gone.\"]},\n  {error:\"I can swims.\",correct:\"I can swim.\",rule:\"Après un modal (can\/must\/should), le verbe ne prend PAS de S.\",options:[\"I can swims.\",\"I can swim.\",\"I can swimming.\",\"I can swam.\"]},\n  {error:\"She has never went to Paris.\",correct:\"She has never been to Paris.\",rule:\"Present Perfect de GO = HAVE + BEEN (pas WENT).\",options:[\"She has never went.\",\"She has never been.\",\"She has never go.\",\"She have never been.\"]},\n  {error:\"If I will be you, I would go.\",correct:\"If I were you, I would go.\",rule:\"2ème conditionnel : IF + WERE (pas WILL).\",options:[\"If I will be you.\",\"If I was you.\",\"If I were you.\",\"If I am you.\"]},\n  {error:\"They was at the cinema.\",correct:\"They were at the cinema.\",rule:\"They\/We\/You + WERE (pas WAS) au prétérit.\",options:[\"They was.\",\"They were.\",\"They is.\",\"They are.\"]}\n];\n\nlet currentPlayerData = null;\nlet currentPlayerName = null;\nlet camIdx = 0;\nlet camHelped = 0;\n\nfunction getPlayers(){try{return JSON.parse(localStorage.getItem(PLAYERS_KEY))||{};}catch(e){return {};}}\nfunction savePlayers(p){localStorage.setItem(PLAYERS_KEY,JSON.stringify(p));}\n\nfunction loadPlayerList(){\n  const sel=document.getElementById(\"playerSelect\");\n  const players=getPlayers();\n  sel.innerHTML=\"<option value=''>-- Choisir un joueur --<\/option>\";\n  Object.keys(players).forEach(n=>{\n    const o=document.createElement(\"option\"); o.value=n;\n    o.textContent=n+\" (Niv.\"+players[n].currentLevel+\")\";\n    sel.appendChild(o);\n  });\n  const names=Object.keys(players);\n  if(names.length>0){sel.value=names[0];loadPlayer(names[0]);}\n}\n\nfunction loadPlayer(name){\n  if(!name){currentPlayerData=null;return;}\n  const players=getPlayers();\n  currentPlayerData=players[name]||null;\n  currentPlayerName=name;\n  if(currentPlayerData){renderAll();}\n}\n\nfunction showTab(id,btn){\n  document.querySelectorAll(\".tab-content\").forEach(t=>t.classList.remove(\"active\"));\n  document.querySelectorAll(\".tab-btn\").forEach(b=>b.classList.remove(\"active\"));\n  document.getElementById(id).classList.add(\"active\");\n  if(btn)btn.classList.add(\"active\");\n  if(id===\"cameleon\")renderCameleon();\n  if(id===\"fiches\")renderFiches();\n}\n\nfunction renderAll(){\n  if(!currentPlayerData)return;\n  const p=currentPlayerData;\n  document.getElementById(\"statLevel\").textContent=p.currentLevel||1;\n  document.getElementById(\"statScore\").textContent=p.score||0;\n  document.getElementById(\"statStreak\").textContent=p.streak||0;\n  const rate=p.totalQuestions>0?Math.round((p.totalCorrect||0)\/p.totalQuestions*100):0;\n  document.getElementById(\"statRate\").textContent=rate+\"%\";\n  renderLevelBars();\n  renderBadges();\n}\n\nfunction renderLevelBars(){\n  const p=currentPlayerData;\n  const completed=p.completed||[];\n  const current=p.currentLevel||1;\n  let h=\"\";\n  for(let i=1;i<=10;i++){\n    const done=completed.includes(i);\n    const isCur=i===current&&!done;\n    const locked=i>current&&!done;\n    let pct=done?100:isCur?50:0;\n    h+=`<div class=\"level-row\">\n      <span class=\"level-row-label\">Niv. ${i}<\/span>\n      <div class=\"progress-bar\"><div class=\"progress-fill${locked?\" locked\":\"\"}\" style=\"width:${pct}%\"><\/div><\/div>\n      <span class=\"level-row-pct\">${done?\"✅\":isCur?\"▶\":locked?\"🔒\":\"—\"}<\/span>\n    <\/div>`;\n  }\n  document.getElementById(\"levelBars\").innerHTML=h;\n}\n\nfunction renderBadges(){\n  const p=currentPlayerData;\n  let unlocked=0;\n  const h=BADGES_DEF.map(b=>{\n    const ok=b.check(p);\n    if(ok)unlocked++;\n    return `<div class=\"badge${ok?\" unlocked\":\"\"}\">\n      <span class=\"badge-icon\">${b.icon}<\/span>\n      <div class=\"badge-name\">${b.name}<\/div>\n      <div class=\"badge-desc\">${b.desc}<\/div>\n    <\/div>`;\n  }).join(\"\");\n  document.getElementById(\"badgesGrid\").innerHTML=h;\n  document.getElementById(\"badgeCount\").textContent=unlocked;\n}\n\nfunction renderCameleon(){\n  const p=currentPlayerData;\n  const ex=CAMELEON_EXERCISES[camIdx%CAMELEON_EXERCISES.length];\n  const helped=p?p.cameleonHelped||0:0;\n  const c=document.getElementById(\"cameleonContent\");\n  c.innerHTML=`\n    <div class=\"cam-bubble\">❌ Lucas dit : \"${ex.error}\"<\/div>\n    <div class=\"cam-instruction\">Quelle est la phrase correcte ?<\/div>\n    <div class=\"cam-options\">\n      ${ex.options.map((opt,i)=>`<button class=\"cam-btn\" id=\"camBtn${i}\" onclick=\"checkCameleon(${i},'${opt.replace(\/'\/g,\"\\'\")}','${ex.correct.replace(\/'\/g,\"\\'\")}')\">${opt}<\/button>`).join(\"\")}\n    <\/div>\n    <div style=\"margin-top:12px;font-size:.85em;color:#718096\">Lucas aide aidé ${helped} fois ✅<\/div>`;\n  document.getElementById(\"camScore\").textContent=\"\";\n}\n\nfunction checkCameleon(idx,chosen,correct){\n  const isOk=chosen===correct;\n  document.querySelectorAll(\".cam-btn\").forEach(b=>b.disabled=true);\n  document.getElementById(\"camBtn\"+idx).classList.add(isOk?\"correct\":\"wrong\");\n  if(!isOk){\n    const opts=document.querySelectorAll(\".cam-btn\");\n    opts.forEach(b=>{if(b.textContent===correct)b.classList.add(\"correct\");});\n  }\n  const ex=CAMELEON_EXERCISES[camIdx%CAMELEON_EXERCISES.length];\n  document.getElementById(\"camScore\").innerHTML=`\n    ${isOk?\"✅ Bravo ! Tu as aidé Lucas !\":\"❌ Pas tout à fait… Retiens bien :\"}<br>\n    <em>${ex.rule}<\/em>\n    <br><br><button class=\"btn btn-primary\" onclick=\"nextCameleon()\" style=\"margin-top:8px\">Exercice suivant →<\/button>`;\n  if(isOk&&currentPlayerName){\n    const players=getPlayers();\n    const pp=players[currentPlayerName];\n    if(pp){pp.cameleonHelped=(pp.cameleonHelped||0)+1;savePlayers(players);currentPlayerData=pp;}\n  }\n}\n\nfunction nextCameleon(){\n  camIdx++;\n  renderCameleon();\n}\n\nfunction renderFiches(){\n  const p=currentPlayerData;\n  const errors=p&&p.errorHistory?p.errorHistory.slice(-20).reverse():[];\n  const c=document.getElementById(\"fichesContent\");\n  if(errors.length===0){\n    c.innerHTML=\"<div class='cam-no-errors'>🎉 Aucune erreur enregistrée ! Continue comme ça !<\/div>\";return;\n  }\n  const unique=[...new Map(errors.map(e=>[e.question,e])).values()];\n  c.innerHTML=`<p style=\"color:#718096;margin-bottom:14px\">${unique.length} erreurs à réviser :<\/p>`+\n    unique.map(e=>`<div class=\"fiche-card\">\n      <div class=\"fiche-q\">❓ ${e.question}<\/div>\n      <div class=\"fiche-wrong\">✗ Ta réponse : ${e.userAnswer||\"—\"}<\/div>\n      <div class=\"fiche-correct\">✓ Bonne réponse : ${e.correctAnswer}<\/div>\n      ${e.explanation?`<div class=\"fiche-expl\">💡 ${e.explanation}<\/div>`:\"\"}\n    <\/div>`).join(\"\");\n}\n\ndocument.addEventListener(\"DOMContentLoaded\",()=>{loadPlayerList();});\n<\/script>\n\n<\/body>\n<\/html>",
-  "share_sheet_inputs" : [
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Master — Mon Espace</title>
+<style>
+:root{--primary:#667eea;--secondary:#764ba2;--success:#48bb78;--error:#f56565;--warning:#ed8936;--gold:#ffd700}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",system-ui,sans-serif}
+body{background:linear-gradient(135deg,var(--primary),var(--secondary));min-height:100vh;padding:15px}
+.container{max-width:1000px;margin:0 auto;background:white;border-radius:20px;padding:25px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+h1{text-align:center;color:var(--primary);font-size:2.1em;margin-bottom:4px}
+.subtitle{text-align:center;color:#718096;margin-bottom:20px}
+.nav-tabs{display:flex;gap:8px;margin-bottom:22px;border-bottom:2px solid #e2e8f0;padding-bottom:10px;flex-wrap:wrap;align-items:center}
+.tab-btn{padding:10px 18px;border:none;background:#f0f0f0;border-radius:20px;cursor:pointer;font-weight:bold;transition:all .25s;white-space:nowrap;font-size:.9em}
+.tab-btn:hover,.tab-btn.active{background:var(--primary);color:white}
+.tab-content{display:none}
+.tab-content.active{display:block;animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-  ]
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:25px}
+.stat-card{background:linear-gradient(145deg,var(--primary),var(--secondary));color:white;padding:20px;border-radius:15px;text-align:center}
+.stat-num{font-size:2.3em;font-weight:800;display:block}
+.stat-label{font-size:.8em;opacity:.9;text-transform:uppercase;letter-spacing:.5px}
+.level-progress{margin-top:20px}
+.level-progress h3{margin-bottom:12px;color:#2d3748}
+.level-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:.9em}
+.level-row-label{width:100px;color:#4a5568;font-weight:600;flex-shrink:0}
+.progress-bar{flex:1;height:14px;background:#e2e8f0;border-radius:7px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--success),#68d391);border-radius:7px;transition:width .6s}
+.progress-fill.locked{background:#e2e8f0}
+.level-row-pct{width:38px;text-align:right;color:#718096;font-size:.85em}
+
+/* BADGES */
+.badges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:10px}
+.badge{background:#f5f7fa;border:2px solid #e2e8f0;border-radius:14px;padding:14px;text-align:center;opacity:.45;filter:grayscale(1);transition:all .3s}
+.badge.unlocked{opacity:1;filter:none;border-color:var(--gold);background:linear-gradient(145deg,#fff9e6,#fff3cd);box-shadow:0 4px 15px rgba(255,215,0,.25)}
+.badge-icon{font-size:2.4em;margin-bottom:6px;display:block}
+.badge-name{font-weight:bold;font-size:.85em;color:#2d3748;margin-bottom:3px}
+.badge-desc{font-size:.72em;color:#718096}
+
+/* CAMÉLÉON */
+.cam-box{background:#e8f4ff;border-radius:15px;padding:22px}
+.cam-avatar{text-align:center;font-size:4em;margin-bottom:10px}
+.cam-name{text-align:center;font-weight:bold;color:var(--secondary);margin-bottom:14px}
+.cam-bubble{background:white;border:2px dashed var(--error);border-radius:12px;padding:16px;margin-bottom:16px;font-size:1.1em;font-family:monospace;color:#c53030;text-align:center}
+.cam-instruction{font-weight:bold;color:#2d3748;margin-bottom:12px;text-align:center}
+.cam-options{display:grid;gap:10px}
+.cam-btn{padding:13px;border:2px solid #c6d3f7;background:white;border-radius:10px;cursor:pointer;font-size:.95em;text-align:left;transition:all .2s}
+.cam-btn:hover{border-color:var(--primary);background:#f0f4ff}
+.cam-btn.correct{background:#c6f6d5;border-color:var(--success);color:#276749}
+.cam-btn.wrong{background:#fed7d7;border-color:var(--error);color:#c53030}
+.cam-btn:disabled{cursor:not-allowed}
+.cam-score{text-align:center;margin-top:14px;font-weight:bold;color:var(--secondary)}
+.cam-no-errors{text-align:center;color:#718096;padding:30px}
+
+/* FICHES */
+.fiche-card{background:white;border-left:4px solid var(--primary);padding:16px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.07);margin-bottom:12px}
+.fiche-q{font-weight:bold;color:#2d3748;margin-bottom:6px}
+.fiche-wrong{color:var(--error);text-decoration:line-through;font-size:.95em}
+.fiche-correct{color:var(--success);font-weight:bold;font-size:.95em}
+.fiche-expl{color:#718096;font-size:.85em;margin-top:5px;font-style:italic}
+.print-btn{background:var(--primary);color:white;border:none;padding:10px 22px;border-radius:20px;cursor:pointer;font-weight:bold;margin-bottom:16px;display:block}
+
+/* PLAYER SELECT */
+.player-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.player-header select{padding:8px 12px;border:2px solid #e2e8f0;border-radius:10px;font-size:.95em;flex:1;min-width:150px}
+.btn{padding:9px 18px;border:none;border-radius:10px;cursor:pointer;font-weight:bold;font-size:.9em;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:white}
+.btn-link{background:#f0f4ff;color:var(--primary)}
+
+.no-print-info{background:#f0fff4;border-left:4px solid var(--success);padding:10px 14px;border-radius:0 8px 8px 0;font-size:.85em;color:#276749;margin-bottom:16px}
+@media print{.nav-tabs,.player-header,.print-btn,.no-print{display:none}}
+@media(max-width:600px){.stats-grid{grid-template-columns:repeat(2,1fr)}.badges-grid{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>📊 Mon Espace English Master</h1>
+<div class="subtitle">Tous tes progrès, badges et révisions en un coup d'œil</div>
+
+<div class="player-header no-print">
+  <select id="playerSelect" onchange="loadPlayer(this.value)"><option value="">-- Choisir un joueur --</option></select>
+  <button class="btn btn-primary" onclick="window.location.href='quiz.html'">↩ Retour au Quiz</button>
+  <button class="btn btn-link" onclick="window.open('lexique.html','_blank')">📖 Lexique</button>
+</div>
+
+<div class="nav-tabs">
+  <button class="tab-btn active" onclick="showTab('stats',this)">📈 Statistiques</button>
+  <button class="tab-btn" onclick="showTab('badges',this)">🏅 Badges (<span id="badgeCount">0</span>/30)</button>
+  <button class="tab-btn" onclick="showTab('cameleon',this)">🎭 Mode Caméléon</button>
+  <button class="tab-btn" onclick="showTab('fiches',this)">📝 Mes Fiches</button>
+</div>
+
+<!-- STATS -->
+<div id="stats" class="tab-content active">
+  <div class="stats-grid">
+    <div class="stat-card"><span class="stat-num" id="statLevel">1</span><span class="stat-label">Niveau actuel</span></div>
+    <div class="stat-card"><span class="stat-num" id="statScore">0</span><span class="stat-label">Points totaux</span></div>
+    <div class="stat-card"><span class="stat-num" id="statStreak">0</span><span class="stat-label">Série 🔥</span></div>
+    <div class="stat-card"><span class="stat-num" id="statRate">0%</span><span class="stat-label">Précision</span></div>
+  </div>
+  <div class="level-progress">
+    <h3>📚 Progression par niveau</h3>
+    <div id="levelBars"></div>
+  </div>
+</div>
+
+<!-- BADGES -->
+<div id="badges" class="tab-content">
+  <div class="no-print-info">Les badges se débloquent automatiquement selon ta progression dans le quiz.</div>
+  <div class="badges-grid" id="badgesGrid"></div>
+</div>
+
+<!-- CAMÉLÉON -->
+<div id="cameleon" class="tab-content">
+  <div class="cam-box">
+    <div class="cam-avatar">🦎</div>
+    <div class="cam-name">Mode Caméléon — Aide Lucas !</div>
+    <div id="cameleonContent"></div>
+    <div class="cam-score" id="camScore"></div>
+  </div>
+</div>
+
+<!-- FICHES -->
+<div id="fiches" class="tab-content">
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Imprimer mes fiches</button>
+  <div id="fichesContent"></div>
+</div>
+</div>
+
+<script>
+const STORAGE_KEY = "englishMaster_v4";
+const PLAYERS_KEY = "englishMaster_players";
+
+const LEVEL_NAMES = {
+  1:"Décollage 🚀",2:"Routine 📅",3:"En ce moment 👁️",4:"Questions ❓",5:"Retour ⏪",
+  6:"Aventurier ⚔️",7:"Voyant 🔮",8:"Expériences 🏆",9:"Pouvoirs 🪄",10:"Maîtrise 👑"
+};
+
+const BADGES_DEF = [
+  {id:1,icon:"🚀",name:"Premier Pas",desc:"Terminer le niveau 1",check:p=>p.completed&&p.completed.includes(1)},
+  {id:2,icon:"📅",name:"Routinier",desc:"Terminer le niveau 2",check:p=>p.completed&&p.completed.includes(2)},
+  {id:3,icon:"👁️",name:"Observateur",desc:"Terminer le niveau 3",check:p=>p.completed&&p.completed.includes(3)},
+  {id:4,icon:"❓",name:"Questionneur",desc:"Terminer le niveau 4",check:p=>p.completed&&p.completed.includes(4)},
+  {id:5,icon:"⏪",name:"Archiviste",desc:"Terminer le niveau 5",check:p=>p.completed&&p.completed.includes(5)},
+  {id:6,icon:"⚔️",name:"Aventurier",desc:"Terminer le niveau 6",check:p=>p.completed&&p.completed.includes(6)},
+  {id:7,icon:"🔮",name:"Voyant",desc:"Terminer le niveau 7",check:p=>p.completed&&p.completed.includes(7)},
+  {id:8,icon:"🏆",name:"Champion",desc:"Terminer le niveau 8",check:p=>p.completed&&p.completed.includes(8)},
+  {id:9,icon:"🪄",name:"Magicien",desc:"Terminer le niveau 9",check:p=>p.completed&&p.completed.includes(9)},
+  {id:10,icon:"👑",name:"English Master",desc:"Terminer le niveau 10",check:p=>p.completed&&p.completed.includes(10)},
+  {id:11,icon:"🎯",name:"Sniper",desc:"Avoir 100% à un niveau",check:p=>false},
+  {id:12,icon:"🔥",name:"En feu !",desc:"Série de 10 bonnes réponses",check:p=>(p.streak||0)>=10},
+  {id:13,icon:"⚡",name:"Éclair",desc:"Série de 20 bonnes réponses",check:p=>(p.streak||0)>=20},
+  {id:14,icon:"💎",name:"Diamant",desc:"Dépasser 500 points",check:p=>(p.score||0)>=500},
+  {id:15,icon:"🌟",name:"Étoile",desc:"Dépasser 1000 points",check:p=>(p.score||0)>=1000},
+  {id:16,icon:"🌈",name:"Arc-en-ciel",desc:"Dépasser 2000 points",check:p=>(p.score||0)>=2000},
+  {id:17,icon:"📝",name:"Scripteur",desc:"Répondre à 50 questions",check:p=>(p.totalQuestions||0)>=50},
+  {id:18,icon:"📚",name:"Bosseur",desc:"Répondre à 100 questions",check:p=>(p.totalQuestions||0)>=100},
+  {id:19,icon:"🧠",name:"Génie",desc:"Répondre à 200 questions",check:p=>(p.totalQuestions||0)>=200},
+  {id:20,icon:"✅",name:"Précis",desc:"80% de bonnes réponses sur 20 questions",check:p=>p.totalQuestions>=20&&((p.totalCorrect||0)/p.totalQuestions)>=0.8},
+  {id:21,icon:"🦅",name:"Aigle",desc:"90% de bonnes réponses sur 50 questions",check:p=>p.totalQuestions>=50&&((p.totalCorrect||0)/p.totalQuestions)>=0.9},
+  {id:22,icon:"🏅",name:"Médaillé",desc:"5 niveaux terminés",check:p=>(p.completed||[]).length>=5},
+  {id:23,icon:"🎓",name:"Diplômé",desc:"8 niveaux terminés",check:p=>(p.completed||[]).length>=8},
+  {id:24,icon:"🦁",name:"Courageux",desc:"Rejouer après une erreur",check:p=>(p.totalQuestions||0)>=2},
+  {id:25,icon:"🔁",name:"Persévérant",desc:"Revenir sur ses erreurs",check:p=>(p.errorHistory||[]).length>0},
+  {id:26,icon:"🎭",name:"Ami de Lucas",desc:"Aider Lucas 1 fois",check:p=>(p.cameleonHelped||0)>=1},
+  {id:27,icon:"👨‍🏫",name:"Professeur",desc:"Aider Lucas 5 fois",check:p=>(p.cameleonHelped||0)>=5},
+  {id:28,icon:"🧑‍🎓",name:"Maître",desc:"Aider Lucas 10 fois",check:p=>(p.cameleonHelped||0)>=10},
+  {id:29,icon:"🌍",name:"Citoyen du monde",desc:"Tous les niveaux terminés",check:p=>(p.completed||[]).length>=10},
+  {id:30,icon:"🏆",name:"Légendaire",desc:"2000+ pts + tous niveaux terminés",check:p=>(p.score||0)>=2000&&(p.completed||[]).length>=10}
+];
+
+const CAMELEON_EXERCISES = [
+  {error:"I is a student.",correct:"I am a student.",rule:"Avec 'I', to be = AM (pas IS).",options:["I am a student.","I is a student.","I are a student.","I be a student."]},
+  {error:"She don't like cats.",correct:"She doesn't like cats.",rule:"She/He/It + doesn't (pas don't).",options:["She don't like cats.","She doesn't like cats.","She not like cats.","She isn't like cats."]},
+  {error:"He play football every day.",correct:"He plays football every day.",rule:"He/She/It + verbe + S au présent simple.",options:["He play football.","He plays football.","He playing football.","He is play football."]},
+  {error:"Look! The cat sleep on the sofa.",correct:"Look! The cat is sleeping on the sofa.",rule:"Look! = action en cours = BE + -ING.",options:["The cat sleep.","The cat sleeping.","The cat is sleeping.","The cat sleeps."]},
+  {error:"I have 10 years.",correct:"I am 10 years old.",rule:"L'âge se dit avec TO BE (pas TO HAVE) en anglais !",options:["I have 10 years.","I am 10 years old.","I has 10 years.","I is 10 years."]},
+  {error:"Yesterday I go to school.",correct:"Yesterday I went to school.",rule:"Yesterday = passé. GO → WENT (irrégulier).",options:["Yesterday I go.","Yesterday I goes.","Yesterday I went.","Yesterday I gone."]},
+  {error:"I can swims.",correct:"I can swim.",rule:"Après un modal (can/must/should), le verbe ne prend PAS de S.",options:["I can swims.","I can swim.","I can swimming.","I can swam."]},
+  {error:"She has never went to Paris.",correct:"She has never been to Paris.",rule:"Present Perfect de GO = HAVE + BEEN (pas WENT).",options:["She has never went.","She has never been.","She has never go.","She have never been."]},
+  {error:"If I will be you, I would go.",correct:"If I were you, I would go.",rule:"2ème conditionnel : IF + WERE (pas WILL).",options:["If I will be you.","If I was you.","If I were you.","If I am you."]},
+  {error:"They was at the cinema.",correct:"They were at the cinema.",rule:"They/We/You + WERE (pas WAS) au prétérit.",options:["They was.","They were.","They is.","They are."]}
+];
+
+let currentPlayerData = null;
+let currentPlayerName = null;
+let camIdx = 0;
+let camHelped = 0;
+
+function getPlayers(){try{return JSON.parse(localStorage.getItem(PLAYERS_KEY))||{};}catch(e){return {};}}
+function savePlayers(p){localStorage.setItem(PLAYERS_KEY,JSON.stringify(p));}
+
+function loadPlayerList(){
+  const sel=document.getElementById("playerSelect");
+  const players=getPlayers();
+  sel.innerHTML="<option value=''>-- Choisir un joueur --</option>";
+  Object.keys(players).forEach(n=>{
+    const o=document.createElement("option"); o.value=n;
+    o.textContent=n+" (Niv."+players[n].currentLevel+")";
+    sel.appendChild(o);
+  });
+  const names=Object.keys(players);
+  if(names.length>0){sel.value=names[0];loadPlayer(names[0]);}
 }
+
+function loadPlayer(name){
+  if(!name){currentPlayerData=null;return;}
+  const players=getPlayers();
+  currentPlayerData=players[name]||null;
+  currentPlayerName=name;
+  if(currentPlayerData){renderAll();}
+}
+
+function showTab(id,btn){
+  document.querySelectorAll(".tab-content").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  if(btn)btn.classList.add("active");
+  if(id==="cameleon")renderCameleon();
+  if(id==="fiches")renderFiches();
+}
+
+function renderAll(){
+  if(!currentPlayerData)return;
+  const p=currentPlayerData;
+  document.getElementById("statLevel").textContent=p.currentLevel||1;
+  document.getElementById("statScore").textContent=p.score||0;
+  document.getElementById("statStreak").textContent=p.streak||0;
+  const rate=p.totalQuestions>0?Math.round((p.totalCorrect||0)/p.totalQuestions*100):0;
+  document.getElementById("statRate").textContent=rate+"%";
+  renderLevelBars();
+  renderBadges();
+}
+
+function renderLevelBars(){
+  const p=currentPlayerData;
+  const completed=p.completed||[];
+  const current=p.currentLevel||1;
+  let h="";
+  for(let i=1;i<=10;i++){
+    const done=completed.includes(i);
+    const isCur=i===current&&!done;
+    const locked=i>current&&!done;
+    let pct=done?100:isCur?50:0;
+    h+=`<div class="level-row">
+      <span class="level-row-label">Niv. ${i}</span>
+      <div class="progress-bar"><div class="progress-fill${locked?" locked":""}" style="width:${pct}%"></div></div>
+      <span class="level-row-pct">${done?"✅":isCur?"▶":locked?"🔒":"—"}</span>
+    </div>`;
+  }
+  document.getElementById("levelBars").innerHTML=h;
+}
+
+function renderBadges(){
+  const p=currentPlayerData;
+  let unlocked=0;
+  const h=BADGES_DEF.map(b=>{
+    const ok=b.check(p);
+    if(ok)unlocked++;
+    return `<div class="badge${ok?" unlocked":""}">
+      <span class="badge-icon">${b.icon}</span>
+      <div class="badge-name">${b.name}</div>
+      <div class="badge-desc">${b.desc}</div>
+    </div>`;
+  }).join("");
+  document.getElementById("badgesGrid").innerHTML=h;
+  document.getElementById("badgeCount").textContent=unlocked;
+}
+
+function renderCameleon(){
+  const p=currentPlayerData;
+  const ex=CAMELEON_EXERCISES[camIdx%CAMELEON_EXERCISES.length];
+  const helped=p?p.cameleonHelped||0:0;
+  const c=document.getElementById("cameleonContent");
+  c.innerHTML=`
+    <div class="cam-bubble">❌ Lucas dit : "${ex.error}"</div>
+    <div class="cam-instruction">Quelle est la phrase correcte ?</div>
+    <div class="cam-options">
+      ${ex.options.map((opt,i)=>`<button class="cam-btn" id="camBtn${i}" onclick="checkCameleon(${i},'${opt.replace(/'/g,"\'")}','${ex.correct.replace(/'/g,"\'")}')">${opt}</button>`).join("")}
+    </div>
+    <div style="margin-top:12px;font-size:.85em;color:#718096">Lucas aide aidé ${helped} fois ✅</div>`;
+  document.getElementById("camScore").textContent="";
+}
+
+function checkCameleon(idx,chosen,correct){
+  const isOk=chosen===correct;
+  document.querySelectorAll(".cam-btn").forEach(b=>b.disabled=true);
+  document.getElementById("camBtn"+idx).classList.add(isOk?"correct":"wrong");
+  if(!isOk){
+    const opts=document.querySelectorAll(".cam-btn");
+    opts.forEach(b=>{if(b.textContent===correct)b.classList.add("correct");});
+  }
+  const ex=CAMELEON_EXERCISES[camIdx%CAMELEON_EXERCISES.length];
+  document.getElementById("camScore").innerHTML=`
+    ${isOk?"✅ Bravo ! Tu as aidé Lucas !":"❌ Pas tout à fait… Retiens bien :"}<br>
+    <em>${ex.rule}</em>
+    <br><br><button class="btn btn-primary" onclick="nextCameleon()" style="margin-top:8px">Exercice suivant →</button>`;
+  if(isOk&&currentPlayerName){
+    const players=getPlayers();
+    const pp=players[currentPlayerName];
+    if(pp){pp.cameleonHelped=(pp.cameleonHelped||0)+1;savePlayers(players);currentPlayerData=pp;}
+  }
+}
+
+function nextCameleon(){
+  camIdx++;
+  renderCameleon();
+}
+
+function renderFiches(){
+  const p=currentPlayerData;
+  const errors=p&&p.errorHistory?p.errorHistory.slice(-20).reverse():[];
+  const c=document.getElementById("fichesContent");
+  if(errors.length===0){
+    c.innerHTML="<div class='cam-no-errors'>🎉 Aucune erreur enregistrée ! Continue comme ça !</div>";return;
+  }
+  const unique=[...new Map(errors.map(e=>[e.question,e])).values()];
+  c.innerHTML=`<p style="color:#718096;margin-bottom:14px">${unique.length} erreurs à réviser :</p>`+
+    unique.map(e=>`<div class="fiche-card">
+      <div class="fiche-q">❓ ${e.question}</div>
+      <div class="fiche-wrong">✗ Ta réponse : ${e.userAnswer||"—"}</div>
+      <div class="fiche-correct">✓ Bonne réponse : ${e.correctAnswer}</div>
+      ${e.explanation?`<div class="fiche-expl">💡 ${e.explanation}</div>`:""}
+    </div>`).join("");
+}
+
+document.addEventListener("DOMContentLoaded",()=>{loadPlayerList();});
+</script>
+</body>
+</html>
