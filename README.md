@@ -1,7 +1,13 @@
 # English-Master
 Quiz Game Anglais CM2 
 
-Ce dossier contient 
+pour acceder au jeu rendez vous a cette adresse : 
+
+https://eka-dev5.github.io/English-Master/quiz.html
+
+
+-------------------
+le dossier du programme contient egalement 
 
 - Un fichier "Quiz" permettant de lancer le jeu
  
@@ -11,7 +17,7 @@ Ce dossier contient
 
 README.JOUEURS : contient les regles du jeu d'anglais.
 
-README.DEV : contient les donnees permettang de commprendre le code.
+README.DEV : contient les donnees informatives sur le code.
 
 Selon votre statut, ouvrez le fichier qui vous interresse.
 
