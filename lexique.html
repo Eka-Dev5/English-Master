@@ -243,7 +243,22 @@ function closeModal(e){
   if(!e||e.target.id==="modal")document.getElementById("modal").classList.remove("show");
 }
 
-document.addEventListener("DOMContentLoaded",renderWords);
+document.addEventListener("DOMContentLoaded",()=>{
+  const hash = window.location.hash.replace('#','');
+  const params = new URLSearchParams(window.location.search);
+  const lvlParam = params.get('level');
+  if(hash){
+    currentSearch = decodeURIComponent(hash);
+    document.getElementById('searchBox').value = currentSearch;
+  }
+  if(lvlParam){
+    currentLevel = parseInt(lvlParam);
+    document.querySelectorAll('.level-tab').forEach(b=>b.classList.remove('active'));
+    const tabs = document.querySelectorAll('.level-tab');
+    if(tabs[currentLevel]) tabs[currentLevel].classList.add('active');
+  }
+  renderWords();
+});
 </script>
 </body>
 </html>

@@ -224,6 +224,18 @@ body{background:linear-gradient(135deg,var(--primary),var(--secondary));min-heig
     </div>
     <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
   </div>
+
+  <!-- ÉCRAN LEÇON AVANT QUIZ -->
+  <div id="lessonIntro" style="display:none;background:#f0f4ff;border-radius:14px;padding:22px;margin-bottom:16px;text-align:center">
+    <div style="font-size:3em;margin-bottom:10px">📚</div>
+    <h3 id="lessonIntroTitle" style="color:var(--primary);margin-bottom:8px"></h3>
+    <p id="lessonIntroObj" style="color:#718096;margin-bottom:16px"></p>
+    <div id="lessonIntroContent" style="background:white;border-radius:12px;padding:16px;margin-bottom:16px;font-size:.95em;line-height:1.6;max-height:35vh;overflow-y:auto;color:#2d3748;text-align:left"></div>
+    <a id="lessonIntroLexique" href="#" target="_blank" style="display:inline-block;margin-bottom:12px;color:var(--primary);font-weight:bold;text-decoration:none;border-bottom:1px dashed var(--primary)">📖 Voir le vocabulaire du niveau</a>
+    <br>
+    <button class="btn btn-primary" onclick="startQuestions()" style="padding:14px 32px;font-size:1.1em;border-radius:14px">🎮 C'est parti !</button>
+  </div>
+
   <div class="question-box">
     <div class="question-num" id="questionNum"></div>
     <div class="question-text" id="questionText"></div>
@@ -282,108 +294,175 @@ const SUBJECT_CONFIG = {
 // ═══════════════════════════════════════════════════════════════════
 const LESSONS_DATA = [
   {
-    num:1, title:"TO BE / TO HAVE (Être / Avoir)",
+    num:1, title:"TO BE / TO HAVE + Articles de base",
     content:`<div class="lesson-rule"><h4>TO BE — Je/Tu/Il/Nous/Vous/Ils</h4>
     <table class="lesson-table"><tr><th>Français</th><th>Anglais</th><th>Contracté</th></tr>
     <tr><td>Je suis</td><td>I am</td><td>I'm</td></tr>
-    <tr><td>Tu es</td><td>You are</td><td>You're</td></tr>
-    <tr><td>Il/Elle est</td><td>He/She/It is</td><td>He's / She's</td></tr>
+    <tr><td>Tu es / Vous êtes</td><td>You are</td><td>You're</td></tr>
+    <tr><td>Il/Elle/On est</td><td>He/She/It is</td><td>He's / She's / It's</td></tr>
     <tr><td>Nous sommes</td><td>We are</td><td>We're</td></tr>
     <tr><td>Ils/Elles sont</td><td>They are</td><td>They're</td></tr>
     </table></div>
-    <div class="lesson-warning">⚠️ L'âge se dit avec TO BE : <strong>"I am 10 years old"</strong> (pas "I have 10 years" !)</div>
-    <div class="lesson-rule"><h4>TO HAVE (avoir / possession)</h4>
-    <p>I/You/We/They → <strong>have</strong> &nbsp;|&nbsp; He/She/It → <strong>has</strong></p>
-    <p style="margin-top:6px">Négation : I <strong>haven't</strong> / She <strong>hasn't</strong></p></div>
-    <div class="lesson-example">✅ She <strong>is</strong> a doctor. &nbsp; He <strong>has</strong> blue eyes. &nbsp; I <strong>am</strong> 10.</div>`
+    <div class="lesson-rule"><h4>TO HAVE — Avoir / Possession</h4>
+    <p>J'ai → <strong>I have</strong> → <strong>I've got</strong> &nbsp;|&nbsp; Il a → <strong>He has</strong> → <strong>He's got</strong></p>
+    <p style="margin-top:6px">Négation : I <strong>haven't</strong> got / He <strong>hasn't</strong> got</p>
+    <p>On utilise souvent <a href="lexique.html#have" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">have got</a> à l'oral pour parler de possession.</p></div>
+    <div class="lesson-warning">⚠️ L'âge se dit avec TO BE : <strong>"I am 10 years old"</strong> (pas "I have 10 years" !)<br>⚠️ Métier aussi : <strong>She is a <a href="lexique.html#doctor" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">doctor</a></strong>.</div>
+    <div class="lesson-rule"><h4>Les articles A / AN / THE / Ø</h4>
+    <table class="lesson-table"><tr><th>Article</th><th>Quand ?</th><th>Exemple</th></tr>
+    <tr><td><strong>A</strong></td><td>Devant une consonne, 1ère fois</td><td>a book, a dog</td></tr>
+    <tr><td><strong>AN</strong></td><td>Devant une voyelle (a,e,i,o,u), 1ère fois</td><td>an apple, an elephant</td></tr>
+    <tr><td><strong>THE</strong></td><td>On connaît déjà, ou unique</td><td>the sun, the book on the table</td></tr>
+    <tr><td><strong>Ø</strong> (rien)</td><td>Généralités, noms propres</td><td>I like chocolate, I live in London</td></tr>
+    </table></div>
+    <div class="lesson-example">✅ She <strong>is</strong> a <a href="lexique.html#teacher" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">teacher</a>. &nbsp; He <strong>has got</strong> blue <a href="lexique.html#eyes" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">eyes</a>. &nbsp; I <strong>am</strong> 10.<br>✅ I have <strong>a</strong> <a href="lexique.html#sister" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">sister</a> and <strong>a</strong> <a href="lexique.html#brother" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">brother</a>. <strong>The</strong> sun is hot.</div>`
   },
   {
-    num:2, title:"Présent Simple (habitudes, routines)",
+    num:2, title:"Présent Simple (habitudes & routines)",
     content:`<div class="lesson-rule"><h4>Formation</h4>
-    <p><strong>I/You/We/They</strong> + verbe : <em>I play, They work</em></p>
-    <p style="margin-top:5px"><strong>He/She/It</strong> + verbe + <strong>S</strong> : <em>He plays, She works</em></p>
+    <p><strong>I/You/We/They</strong> + verbe : <em>I <a href="lexique.html#play" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">play</a>, They <a href="lexique.html#work" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">work</a></em></p>
+    <p style="margin-top:5px"><strong>He/She/It</strong> + verbe + <strong>S</strong> : <em>He <a href="lexique.html#watch" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">watches</a>, She <a href="lexique.html#eat" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">eats</a></em></p>
     <p style="margin-top:5px">Négation : don't / doesn't &nbsp;|&nbsp; Question : Do/Does ?</p></div>
+    <div class="lesson-rule"><h4>Adverbes de fréquence</h4>
+    <p><a href="lexique.html#always" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">always</a> (toujours) → <a href="lexique.html#often" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">often</a> (souvent) → sometimes → rarely → <a href="lexique.html#never" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">never</a> (jamais)</p>
+    <p style="margin-top:5px">I <strong>always</strong> eat breakfast. &nbsp; She <strong>never</strong> arrives late.</p></div>
     <div class="lesson-warning">⚠️ Après <strong>does/doesn't</strong>, le verbe ne prend <strong>PAS de S</strong> !<br>❌ He doesn't plays → ✅ He doesn't <strong>play</strong></div>
-    <div class="lesson-example">✅ She <strong>speaks</strong> English. &nbsp; Does he <strong>play</strong>? &nbsp; They don't <strong>eat</strong> meat.</div>`
+    <div class="lesson-example">✅ She <strong>speaks</strong> English. &nbsp; Does he <strong>play</strong>? &nbsp; They don't <strong>eat</strong> meat.<br>✅ I <strong>brush</strong> my teeth twice a day. &nbsp; He <strong>studies</strong> <a href="lexique.html#study" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">English</a>.</div>`
   },
   {
     num:3, title:"Présent Continu (action en ce moment)",
     content:`<div class="lesson-rule"><h4>Formation : BE + verbe -ING</h4>
-    <p>I <strong>am</strong> playing &nbsp;|&nbsp; She <strong>is</strong> eating &nbsp;|&nbsp; They <strong>are</strong> running</p></div>
+    <p>I <strong>am</strong> <a href="lexique.html#play" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">playing</a> &nbsp;|&nbsp; She <strong>is</strong> <a href="lexique.html#eat" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">eating</a> &nbsp;|&nbsp; They <strong>are</strong> running</p></div>
     <div class="lesson-rule"><h4>Mots déclencheurs</h4>
-    <p>now, right now, look!, listen!, at the moment, be quiet!</p></div>
+    <p><a href="lexique.html#now" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">now</a>, <a href="lexique.html#right now" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">right now</a>, look!, listen!, <a href="lexique.html#at the moment" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">at the moment</a>, be quiet!</p></div>
+    <div class="lesson-rule"><h4>Présent Simple (habitudes) vs Continu (maintenant)</h4>
+    <p>I <strong>play</strong> football (d'habitude) → I <strong>am playing</strong> football (en ce moment)</p>
+    <p>Water <strong>boils</strong> at 100° (vérité) → The water <strong>is boiling</strong> (elle bout maintenant)</p></div>
     <div class="lesson-warning">⚠️ Consonne finale doublée : run → runn<strong>ing</strong> | swim → swimm<strong>ing</strong><br>E final muet enlevé : make → mak<strong>ing</strong></div>
-    <div class="lesson-example">✅ Look! The baby <strong>is crying</strong>. &nbsp; Shh! I <strong>am reading</strong>.</div>`
+    <div class="lesson-example">✅ Look! The baby <strong>is crying</strong>. &nbsp; Shh! I <strong>am reading</strong>.<br>✅ <a href="lexique.html#right now" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">Right now</a>, she <strong>is cooking</strong> dinner.</div>`
   },
   {
-    num:4, title:"Do / Does / Did (questions et négations)",
+    num:4, title:"Do / Does / Did + Questions",
     content:`<div class="lesson-rule"><h4>Présent</h4>
     <p><strong>Do</strong> → I, You, We, They &nbsp;|&nbsp; <strong>Does</strong> → He, She, It</p>
     <p style="margin-top:5px">Négation : <strong>don't</strong> (I) / <strong>doesn't</strong> (she)</p></div>
     <div class="lesson-rule"><h4>Passé</h4>
-    <p><strong>Did</strong> → toutes les personnes (hier, last week…)</p>
+    <p><strong>Did</strong> → toutes les personnes (<a href="lexique.html#yesterday" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">yesterday</a>, <a href="lexique.html#last week" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">last week</a>…)</p>
     <p style="margin-top:5px">Négation passé : <strong>didn't</strong> + infinitif</p></div>
-    <div class="lesson-example">✅ <strong>Do</strong> you like pizza? &nbsp; <strong>Does</strong> she work? &nbsp; <strong>Did</strong> he go yesterday?</div>`
+    <div class="lesson-rule"><h4>Mots interrogatifs essentiels</h4>
+    <table class="lesson-table"><tr><th>Mot</th><th>Sens</th><th>Exemple</th></tr>
+    <tr><td>WHAT</td><td>Quoi ? / Quel ?</td><td>What is your name?</td></tr>
+    <tr><td>WHERE</td><td>Où ?</td><td>Where do you live?</td></tr>
+    <tr><td>WHEN</td><td>Quand ?</td><td>When is your birthday?</td></tr>
+    <tr><td>WHO</td><td>Qui ?</td><td>Who is this boy?</td></tr>
+    <tr><td>WHY</td><td>Pourquoi ?</td><td>Why are you sad?</td></tr>
+    <tr><td>HOW</td><td>Comment ?</td><td>How are you?</td></tr>
+    <tr><td>HOW OLD</td><td>Quel âge ?</td><td>How old are you?</td></tr>
+    <tr><td>HOW MANY</td><td>Combien ? (dénombrable)</td><td>How many books?</td></tr>
+    </table></div>
+    <div class="lesson-example">✅ <strong>Do</strong> you <a href="lexique.html#like" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">like</a> pizza? &nbsp; <strong>Does</strong> she <a href="lexique.html#work" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">work</a>? &nbsp; <strong>Did</strong> he go <a href="lexique.html#yesterday" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">yesterday</a>?</div>`
   },
   {
-    num:5, title:"Prétérit Was / Were (état passé)",
-    content:`<div class="lesson-rule"><h4>Formes</h4>
-    <p>I/He/She/It → <strong>was</strong> &nbsp;|&nbsp; You/We/They → <strong>were</strong></p>
+    num:5, title:"Was / Were + Prépositions de temps",
+    content:`<div class="lesson-rule"><h4>Prétérit de TO BE</h4>
+    <p>I/He/She/It → <strong><a href="lexique.html#was" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">was</a></strong> &nbsp;|&nbsp; You/We/They → <strong><a href="lexique.html#were" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">were</a></strong></p>
     <p style="margin-top:5px">Négation : <strong>wasn't</strong> / <strong>weren't</strong></p></div>
-    <div class="lesson-example">✅ I <strong>was</strong> happy yesterday. &nbsp; They <strong>were</strong> at the cinema. &nbsp; <strong>Was</strong> she angry?</div>`
+    <div class="lesson-rule"><h4>Prépositions de temps : AT / ON / IN</h4>
+    <table class="lesson-table"><tr><th>Préposition</th><th>Quand ?</th><th>Exemple</th></tr>
+    <tr><td><strong>AT</strong></td><td>Heure précise</td><td>at 5 o'clock, at noon, at night</td></tr>
+    <tr><td><strong>ON</strong></td><td>Jour, date</td><td>on Monday, on Christmas Day, on June 1st</td></tr>
+    <tr><td><strong>IN</strong></td><td>Mois, année, saison, partie du jour</td><td>in July, in 2024, in summer, in the morning</td></tr>
+    </table>
+    <p style="margin-top:6px">Exception : <strong>at night</strong> (pas "in the night")</p></div>
+    <div class="lesson-example">✅ I <strong>was</strong> <a href="lexique.html#happy" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">happy</a> <a href="lexique.html#yesterday" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">yesterday</a>. &nbsp; They <strong>were</strong> at the cinema.<br>✅ She was <a href="lexique.html#sick" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">sick</a> <a href="lexique.html#last week" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">last week</a>. &nbsp; The <a href="lexique.html#weather" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">weather</a> was beautiful.</div>`
   },
   {
-    num:6, title:"Prétérit Irréguliers (actions passées)",
+    num:6, title:"Prétérit irréguliers + Prépositions de lieu",
     content:`<div class="lesson-rule"><h4>Verbes irréguliers à connaître</h4>
     <table class="lesson-table"><tr><th>Infinitif</th><th>Prétérit</th><th>Infinitif</th><th>Prétérit</th></tr>
-    <tr><td>go</td><td>went</td><td>eat</td><td>ate</td></tr>
-    <tr><td>see</td><td>saw</td><td>take</td><td>took</td></tr>
-    <tr><td>have</td><td>had</td><td>come</td><td>came</td></tr>
-    <tr><td>give</td><td>gave</td><td>tell</td><td>told</td></tr>
-    <tr><td>buy</td><td>bought</td><td>write</td><td>wrote</td></tr>
-    <tr><td>hear</td><td>heard</td><td>lose</td><td>lost</td></tr>
+    <tr><td>go</td><td><strong><a href="lexique.html#went" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">went</a></strong></td><td><a href="lexique.html#eat" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">eat</a></td><td><strong><a href="lexique.html#ate" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">ate</a></strong></td></tr>
+    <tr><td>see</td><td><strong><a href="lexique.html#saw" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">saw</a></strong></td><td>take</td><td><strong><a href="lexique.html#took" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">took</a></strong></td></tr>
+    <tr><td>have</td><td><strong><a href="lexique.html#had" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">had</a></strong></td><td>come</td><td><strong><a href="lexique.html#came" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">came</a></strong></td></tr>
+    <tr><td>give</td><td>gave</td><td><a href="lexique.html#tell" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">tell</a></td><td><strong><a href="lexique.html#told" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">told</a></strong></td></tr>
+    <tr><td>buy</td><td><strong><a href="lexique.html#bought" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">bought</a></strong></td><td><a href="lexique.html#write" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">write</a></td><td><strong><a href="lexique.html#wrote" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">wrote</a></strong></td></tr>
+    <tr><td><a href="lexique.html#hear" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">hear</a></td><td><strong><a href="lexique.html#heard" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">heard</a></strong></td><td>lose</td><td><strong><a href="lexique.html#lost" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">lost</a></strong></td></tr>
     </table></div>
-    <div class="lesson-example">✅ Yesterday I <strong>went</strong> to school. &nbsp; She <strong>ate</strong> pizza.</div>`
+    <div class="lesson-rule"><h4>Prépositions de lieu</h4>
+    <table class="lesson-table"><tr><th>Préposition</th><th>Sens</th><th>Exemple</th></tr>
+    <tr><td>IN</td><td>Dans (fermé)</td><td>in the box, in Paris, in the garden</td></tr>
+    <tr><td>ON</td><td>Sur</td><td>on the table, on the wall, on the bus</td></tr>
+    <tr><td>AT</td><td>À (précis)</td><td>at school, at home, at the door</td></tr>
+    <tr><td>UNDER</td><td>Sous</td><td>under the chair</td></tr>
+    <tr><td>BEHIND</td><td>Derrière</td><td>behind the door</td></tr>
+    <tr><td>NEXT TO</td><td>À côté de</td><td>next to the window</td></tr>
+    <tr><td>BETWEEN</td><td>Entre</td><td>between the two trees</td></tr>
+    </table></div>
+    <div class="lesson-example">✅ Yesterday I <strong>went</strong> to school. &nbsp; She <strong>ate</strong> pizza.<br>✅ The cat is <strong>on</strong> the table. &nbsp; The keys are <strong>under</strong> the chair.</div>`
   },
   {
-    num:7, title:"Futur : Will / Going to",
+    num:7, title:"Futur : Will / Going to + CAN",
     content:`<div class="lesson-rule"><h4>WILL = décision spontanée, promesse, prédiction</h4>
-    <p>Sujet + <strong>will</strong> + infinitif &nbsp;|&nbsp; Négation : <strong>won't</strong></p>
-    <p style="margin-top:5px">Ex: I think it <strong>will</strong> rain. &nbsp; I <strong>will</strong> call you later.</p></div>
+    <p>Sujet + <strong><a href="lexique.html#will" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">will</a></strong> + infinitif &nbsp;|&nbsp; Négation : <strong>won't</strong></p>
+    <p style="margin-top:5px">Ex: I think it <strong>will</strong> rain. &nbsp; I <strong>will</strong> call you <a href="lexique.html#later" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">later</a>.</p></div>
     <div class="lesson-rule"><h4>GOING TO = plan, intention, signe visible</h4>
-    <p>Sujet + BE + <strong>going to</strong> + infinitif</p>
-    <p style="margin-top:5px">Ex: It <strong>is going to</strong> rain (nuages !). &nbsp; She <strong>is going to</strong> study.</p></div>
-    <div class="lesson-example">✅ <strong>Will</strong> you help me? &nbsp; Look! He <strong>is going to</strong> fall!</div>`
+    <p>Sujet + BE + <strong><a href="lexique.html#going to" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">going to</a></strong> + infinitif</p>
+    <p style="margin-top:5px">Ex: It <strong>is going to</strong> rain (nuages !). &nbsp; She <strong>is going to</strong> <a href="lexique.html#study" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">study</a>.</p></div>
+    <div class="lesson-rule"><h4>CAN (capacité / permission)</h4>
+    <p><strong><a href="lexique.html#can" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">Can</a></strong> ne change jamais ! Pas de S, pas de TO.</p>
+    <p>• Capacité : I <strong>can</strong> swim. &nbsp; • Permission : <strong>Can</strong> I go out?</p>
+    <p>Négation : <strong>can't</strong> (cannot)</p></div>
+    <div class="lesson-example">✅ <strong>Will</strong> you help me? &nbsp; Look! He <strong>is going to</strong> fall! &nbsp; Birds <strong>can</strong> fly.</div>`
   },
   {
     num:8, title:"Present Perfect (expériences de vie)",
     content:`<div class="lesson-rule"><h4>Formation : HAVE/HAS + participe passé</h4>
-    <p>I/You/We/They → <strong>have</strong> &nbsp;|&nbsp; He/She/It → <strong>has</strong></p></div>
+    <p>I/You/We/They → <strong><a href="lexique.html#have been" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">have</a></strong> &nbsp;|&nbsp; He/She/It → <strong>has</strong></p></div>
     <div class="lesson-rule"><h4>Mots clés</h4>
-    <p><strong>never</strong> (jamais), <strong>ever</strong> (déjà?), <strong>already</strong> (déjà), <strong>yet</strong> (encore/déjà), <strong>just</strong> (à l'instant), <strong>since</strong> (depuis), <strong>for</strong> (depuis/durée)</p></div>
-    <div class="lesson-example">✅ I <strong>have never been</strong> to Paris. &nbsp; She <strong>has just left</strong>. &nbsp; They <strong>have lived</strong> here for 5 years.</div>`
+    <p><strong><a href="lexique.html#never" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">never</a></strong> (jamais), <strong><a href="lexique.html#ever" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">ever</a></strong> (déjà?), <strong><a href="lexique.html#already" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">already</a></strong> (déjà), <strong><a href="lexique.html#yet" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">yet</a></strong> (encore/déjà), <strong><a href="lexique.html#just" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">just</a></strong> (à l'instant), <strong><a href="lexique.html#since" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">since</a></strong> (depuis point précis), <strong><a href="lexique.html#for" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">for</a></strong> (depuis durée)</p></div>
+    <div class="lesson-warning">⚠️ Present Perfect de GO = <strong>HAVE + BEEN</strong> (pas went).<br>❌ I have never went → ✅ I have never <strong>been</strong>.</div>
+    <div class="lesson-example">✅ I <strong>have never been</strong> to Paris. &nbsp; She <strong>has just left</strong>. &nbsp; They <strong>have lived</strong> here <strong>for</strong> 5 years.</div>`
   },
   {
-    num:9, title:"Modaux : Can / Must / Should / Might",
+    num:9, title:"Modaux + Pronoms & Possessifs",
     content:`<div class="lesson-rule"><h4>Les modaux</h4>
     <table class="lesson-table"><tr><th>Modal</th><th>Sens</th><th>Exemple</th></tr>
-    <tr><td><strong>can</strong></td><td>capacité / permission</td><td>I can swim.</td></tr>
-    <tr><td><strong>must</strong></td><td>obligation forte</td><td>You must stop.</td></tr>
-    <tr><td><strong>should</strong></td><td>conseil</td><td>You should sleep.</td></tr>
-    <tr><td><strong>might</strong></td><td>possibilité faible</td><td>He might be home.</td></tr>
+    <tr><td><strong><a href="lexique.html#can" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">can</a></strong></td><td>capacité / permission</td><td>I can swim.</td></tr>
+    <tr><td><strong><a href="lexique.html#must" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">must</a></strong></td><td>obligation forte</td><td>You must stop.</td></tr>
+    <tr><td><strong><a href="lexique.html#should" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">should</a></strong></td><td>conseil</td><td>You should sleep.</td></tr>
+    <tr><td><strong><a href="lexique.html#might" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">might</a></strong></td><td>possibilité faible</td><td>He might be home.</td></tr>
+    <tr><td><strong><a href="lexique.html#may" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">may</a></strong></td><td>permission formelle</td><td>May I come in?</td></tr>
+    <tr><td><strong><a href="lexique.html#could" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">could</a></strong></td><td>politesse / capacité passée</td><td>Could you help me?</td></tr>
     </table></div>
-    <div class="lesson-warning">⚠️ Les modaux ne prennent <strong>jamais de S</strong> : ❌ She cans → ✅ She <strong>can</strong></div>`
+    <div class="lesson-rule"><h4>Adjectifs possessifs</h4>
+    <table class="lesson-table"><tr><th>Sujet</th><th>Adjectif</th><th>Exemple</th></tr>
+    <tr><td>I</td><td>my</td><td>my book</td></tr>
+    <tr><td>You</td><td>your</td><td>your pen</td></tr>
+    <tr><td>He</td><td>his</td><td>his dog</td></tr>
+    <tr><td>She</td><td>her</td><td>her mother</td></tr>
+    <tr><td>It</td><td>its</td><td>its tail</td></tr>
+    <tr><td>We</td><td>our</td><td>our house</td></tr>
+    <tr><td>They</td><td>their</td><td>their car</td></tr>
+    </table></div>
+    <div class="lesson-warning">⚠️ Les modaux ne prennent <strong>jamais de S</strong> : ❌ She cans → ✅ She <strong>can</strong></div>
+    <div class="lesson-example">✅ You <strong>should</strong> see a doctor. &nbsp; <strong>May</strong> I come in? &nbsp; This is <strong>my</strong> <a href="lexique.html#family" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">family</a>.</div>`
   },
   {
-    num:10, title:"Phrases Complexes (If, Although, Because…)",
+    num:10, title:"Phrases Complexes + Communication",
     content:`<div class="lesson-rule"><h4>Conjonctions essentielles</h4>
     <table class="lesson-table"><tr><th>Mot</th><th>Sens</th><th>Temps utilisé</th></tr>
-    <tr><td><strong>if</strong></td><td>si (condition)</td><td>IF + présent → WILL (réel)<br>IF + prétérit → WOULD (imaginaire)</td></tr>
-    <tr><td><strong>unless</strong></td><td>sauf si / à moins que</td><td>même règle que IF</td></tr>
-    <tr><td><strong>although</strong></td><td>bien que</td><td>+ n'importe quel temps</td></tr>
-    <tr><td><strong>because</strong></td><td>parce que</td><td>+ n'importe quel temps</td></tr>
+    <tr><td><strong><a href="lexique.html#if" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">if</a></strong></td><td>si (condition)</td><td>IF + présent → WILL (réel)<br>IF + prétérit → WOULD (imaginaire)</td></tr>
+    <tr><td><strong><a href="lexique.html#unless" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">unless</a></strong></td><td>sauf si / à moins que</td><td>même règle que IF</td></tr>
+    <tr><td><strong><a href="lexique.html#although" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">although</a></strong></td><td>bien que</td><td>+ n'importe quel temps</td></tr>
+    <tr><td><strong><a href="lexique.html#because" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">because</a></strong></td><td>parce que</td><td>+ n'importe quel temps</td></tr>
+    <tr><td><strong><a href="lexique.html#until" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">until</a></strong></td><td>jusqu'à ce que</td><td>indique la limite</td></tr>
+    <tr><td><strong><a href="lexique.html#as soon as" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">as soon as</a></strong></td><td>dès que</td><td>immédiatement après</td></tr>
     </table></div>
-    <div class="lesson-example">✅ <strong>If</strong> it rains, I <strong>will</strong> stay home. &nbsp; <strong>If</strong> I <strong>were</strong> you, I would go.</div>`
+    <div class="lesson-rule"><h4>Phrases utiles pour communiquer</h4>
+    <p>• Se présenter : My name is… / I'm… / I am … years old. / I live in… / I have got …</p>
+    <p>• Parler de ses goûts : I like / I love / I enjoy + -ing &nbsp;|&nbsp; I don't like / I hate + -ing</p>
+    <p>• Demander : <strong>Can</strong> you help me? / <strong>Can</strong> I have…? / Excuse me, where is…?</p>
+    <p>• Quantité : a lot of / lots of / some (affirmatif) / any (négatif/question) / many / much</p></div>
+    <div class="lesson-example">✅ <strong>If</strong> it rains, I <strong>will</strong> stay home. &nbsp; <strong>If</strong> I <strong>were</strong> you, I <strong>would</strong> go.<br>✅ <strong>Although</strong> it is raining, we go out. &nbsp; She is late <strong>because</strong> of the <a href="lexique.html#traffic" target="_blank" style="color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)">traffic</a>.</div>`
   }
 ];
 
@@ -993,8 +1072,46 @@ function startLevel(levelNum){
   else if(mode==="libre") gameState.questions=shuffle(allLibre).slice(0,10);
   else gameState.questions=shuffle([...shuffle(allQcm).slice(0,5),...shuffle(allLibre).slice(0,5)]);
   document.getElementById("gameTitle").textContent="Niveau "+levelNum+" : "+lv.title;
-  showSection("jeu"); renderQuestion();
+  showSection("jeu");
+  showLessonIntro(levelNum);
 }
+
+function showLessonIntro(levelNum){
+  const lv=QUESTIONS_DB[levelNum];
+  const lesson=LESSONS_DATA.find(l=>l.num===levelNum);
+  document.getElementById("questionCounter").textContent="📚 Leçon";
+  document.getElementById("scoreDisplay").textContent="";
+  document.getElementById("progressFill").style.width="0%";
+  
+  document.querySelector(".question-box").style.display="none";
+  document.querySelector(".game-actions").style.display="none";
+  
+  const intro=document.getElementById("lessonIntro");
+  intro.style.display="block";
+  
+  document.getElementById("lessonIntroTitle").textContent=lesson?lesson.title:lv.title;
+  document.getElementById("lessonIntroObj").textContent=lv.objective;
+  
+  let preview="";
+  if(lesson){
+    const tmp=document.createElement("div");
+    tmp.innerHTML=lesson.content;
+    const text=tmp.textContent||tmp.innerText||"";
+    preview=text.substring(0,400).trim()+"...";
+  } else {
+    preview="Objectif : "+lv.objective;
+  }
+  document.getElementById("lessonIntroContent").textContent=preview;
+  document.getElementById("lessonIntroLexique").href="lexique.html?level="+levelNum;
+}
+
+function startQuestions(){
+  document.getElementById("lessonIntro").style.display="none";
+  document.querySelector(".question-box").style.display="block";
+  document.querySelector(".game-actions").style.display="flex";
+  renderQuestion();
+}
+
 function shuffle(a){
   const arr=[...a];
   for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
@@ -1062,7 +1179,8 @@ function validateAnswer(){
   fb.className="feedback show "+(isCorrect?"correct-fb":"wrong-fb");
   document.getElementById("feedbackTitle").textContent=isCorrect?"✅ Bonne réponse !":"❌ Pas tout à fait…";
   document.getElementById("feedbackCorrect").textContent=isCorrect?"":"Bonne réponse : "+(q.correct||q.answer);
-  document.getElementById("feedbackExplanation").textContent=q.explanation||"";
+  document.getElementById("feedbackExplanation").innerHTML=(q.explanation||"")+`<br><br><a href="lexique.html?level=${gameState.currentLevel}" target="_blank" style="color:var(--primary);font-size:.9em;font-weight:bold">📖 Voir le vocabulaire du niveau ${gameState.currentLevel}</a>`;
+
   // Stats
   gameState.answers.push({question:q.q,userAnswer,correct:q.correct||q.answer,isCorrect,explanation:q.explanation});
   if(isCorrect) gameState.score+=10; else trackError(q,userAnswer);

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -196,6 +197,8 @@ let currentPlayerData = null;
 let currentPlayerName = null;
 let camIdx = 0;
 let camHelped = 0;
+let currentCamOptions = [];
+
 
 function exportSave(){
   const players=getPlayers();
@@ -309,19 +312,23 @@ function renderBadges(){
 function renderCameleon(){
   const p=currentPlayerData;
   const ex=CAMELEON_EXERCISES[camIdx%CAMELEON_EXERCISES.length];
+  currentCamOptions = ex.options;
   const helped=p?p.cameleonHelped||0:0;
   const c=document.getElementById("cameleonContent");
   c.innerHTML=`
     <div class="cam-bubble">❌ Lucas dit : "${ex.error}"</div>
     <div class="cam-instruction">Quelle est la phrase correcte ?</div>
     <div class="cam-options">
-      ${ex.options.map((opt,i)=>`<button class="cam-btn" id="camBtn${i}" onclick="checkCameleon(${i},'${opt.replace(/'/g,"\'")}','${ex.correct.replace(/'/g,"\'")}')">${opt}</button>`).join("")}
+      ${ex.options.map((opt,i)=>`<button class="cam-btn" id="camBtn${i}" onclick="checkCameleon(${i})">${opt}</button>`).join("")}
     </div>
-    <div style="margin-top:12px;font-size:.85em;color:#718096">Lucas aide aidé ${helped} fois ✅</div>`;
+    <div style="margin-top:12px;font-size:.85em;color:#718096">Lucas aidé ${helped} fois ✅</div>`;
   document.getElementById("camScore").textContent="";
 }
 
-function checkCameleon(idx,chosen,correct){
+function checkCameleon(idx){
+  const ex=CAMELEON_EXERCISES[camIdx%CAMELEON_EXERCISES.length];
+  const chosen = currentCamOptions[idx];
+  const correct = ex.correct;
   const isOk=chosen===correct;
   document.querySelectorAll(".cam-btn").forEach(b=>b.disabled=true);
   document.getElementById("camBtn"+idx).classList.add(isOk?"correct":"wrong");
@@ -329,7 +336,6 @@ function checkCameleon(idx,chosen,correct){
     const opts=document.querySelectorAll(".cam-btn");
     opts.forEach(b=>{if(b.textContent===correct)b.classList.add("correct");});
   }
-  const ex=CAMELEON_EXERCISES[camIdx%CAMELEON_EXERCISES.length];
   document.getElementById("camScore").innerHTML=`
     ${isOk?"✅ Bravo ! Tu as aidé Lucas !":"❌ Pas tout à fait… Retiens bien :"}<br>
     <em>${ex.rule}</em>
