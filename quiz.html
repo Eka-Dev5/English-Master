@@ -215,16 +215,10 @@ body{background:linear-gradient(135deg,var(--primary),var(--secondary));min-heig
 
 /* 📱 Mobile : réduire padding pour les petits écrans fin de règle  */
 
-/* Correction ciblée pour le tableau des articles (mobile uniquement) */
-@media (max-width: 600px) {
-    /* Tableau des articles dans les leçons et l'intro */
-    .lesson-table,
-    #lessonIntroContent .lesson-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+/* Correction MINIMALE pour le tableau des articles (mobile uniquement) */
 
-    /* Première colonne (T/H/E/⌀) : largeur fixe et texte centré */
+@media (max-width: 600px) {
+    /* Première colonne (T/H/E/⌀) : largeur fixe mais texte NORMAL */
     .lesson-table th:first-child,
     .lesson-table td:first-child,
     #lessonIntroContent .lesson-table th:first-child,
@@ -232,21 +226,18 @@ body{background:linear-gradient(135deg,var(--primary),var(--secondary));min-heig
         width: 50px;
         min-width: 50px;
         max-width: 50px;
-        padding: 6px 2px;
-        font-size: 0.9em;
+        padding: 8px 2px;
+        font-size: 1em; /* Taille NORMALE */
         text-align: center;
-        white-space: normal;
         word-break: break-word;
     }
 
-    /* Autres colonnes : texte légèrement réduit mais lisible */
-    .lesson-table th:not(:first-child),
-    .lesson-table td:not(:first-child),
-    #lessonIntroContent .lesson-table th:not(:first-child),
-    #lessonIntroContent .lesson-table td:not(:first-child) {
-        padding: 8px;
-        font-size: 0.9em;
-        text-align: center;
+    /* Tableau complet : défilement horizontal si nécessaire */
+    .lesson-table,
+    #lessonIntroContent .lesson-table {
+        width: 100%;
+        overflow-x: auto;
+        display: block;
     }
 }
  /* fin de modif des affichages pour écran petits  */
