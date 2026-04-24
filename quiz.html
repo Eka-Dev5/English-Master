@@ -301,11 +301,23 @@ body{background:linear-gradient(135deg,var(--primary),var(--secondary));min-heig
   </div>
 
   <!-- ÉCRAN LEÇON AVANT QUIZ -->
-  <div id="lessonIntro" style="display:none;background:#f0f4ff;border-radius:14px;padding:22px;margin-bottom:16px;text-align:center">
+
+  <!-- changement pour affichage aéré -->
+
+<div id="lessonIntro">
+
+  <!-- changement  pour affichage aéré fin -->
+
     <div style="font-size:3em;margin-bottom:10px">📚</div>
     <h3 id="lessonIntroTitle" style="color:var(--primary);margin-bottom:8px"></h3>
     <p id="lessonIntroObj" style="color:#718096;margin-bottom:16px"></p>
-    <div id="lessonIntroContent" style="background:white;border-radius:12px;padding:16px;margin-bottom:16px;font-size:.95em;line-height:1.6;max-height:35vh;overflow-y:auto;color:#2d3748;text-align:left"></div>
+  
+<!-- changement  pour affichage aéré 2 -->
+
+<div id="lessonIntroContent"></div>
+
+  <!-- changement  pour affichage aéré fin -->
+
     <a id="lessonIntroLexique" href="#" target="_blank" style="display:inline-block;margin-bottom:12px;color:var(--primary);font-weight:bold;text-decoration:none;border-bottom:1px dashed var(--primary)">📖 Voir le vocabulaire du niveau</a>
     <br>
     <button class="btn btn-primary" onclick="startQuestions()" style="padding:14px 32px;font-size:1.1em;border-radius:14px">🎮 C'est parti !</button>
