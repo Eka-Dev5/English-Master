@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>English Master 🎓</title>
-<style>
+<title>English Master 🎓</title>`<style>
 /* ═══════════════════════════════════════════
    SUJET CONFIG : changer ici pour adapter à une autre matière
    Ex: Maths Master, Histoire Master, etc.
@@ -136,6 +135,70 @@ body{background:linear-gradient(135deg,var(--primary),var(--secondary));min-heig
   .levels-container{grid-template-columns:1fr}
   .home-btns .btn{font-size:.9em}
 }
+/* Rendu propre de l'intro niveau / Décollage */
+#lessonIntro{
+  display:none;
+  background:#f0f4ff;
+  border-radius:14px;
+  padding:24px 22px;
+  margin-bottom:18px;
+  text-align:left;
+  line-height:1.6;
+}
+
+#lessonIntroTitle{
+  color:var(--primary);
+  margin-bottom:10px;
+  font-size:1.35rem;
+  font-weight:800;
+}
+
+#lessonIntroObj{
+  color:#718096;
+  margin-bottom:16px;
+  font-size:1rem;
+}
+
+#lessonIntroContent{
+  background:white;
+  border-radius:12px;
+  padding:18px;
+  margin-bottom:16px;
+  font-size:1rem;
+  line-height:1.7;
+  max-height:45vh;
+  overflow-y:auto;
+  color:#2d3748;
+  text-align:left;
+  white-space:normal;
+  word-break:break-word;
+}
+
+#lessonIntroContent p,
+#lessonIntroContent div{
+  margin-bottom:10px;
+}
+
+#lessonIntroContent table{
+  width:100%;
+  display:block;
+  overflow-x:auto;
+  border-collapse:collapse;
+}
+
+#lessonIntroContent td,
+#lessonIntroContent th{
+  padding:8px 10px;
+  white-space:normal;
+}
+
+#lessonIntroContent h4{
+  margin:10px 0 6px;
+  font-size:1rem;
+}
+
+
+
 </style>
 </head>
 <body>
@@ -164,13 +227,21 @@ body{background:linear-gradient(135deg,var(--primary),var(--secondary));min-heig
   <button class="btn" onclick="showSection('lecons')" style="background:#f0f4ff;color:var(--primary)">📚 Leçons</button>
   <button class="btn" onclick="showSection('niveaux')" style="background:#f0fff4;color:#276749">🎮 Niveaux</button>
   <button class="btn" onclick="window.open('dashboard.html','_blank')" style="background:#fff5d6;color:#744210">📊 Espace</button>
-  <button class="btn" onclick="window.open('lexique.html','_blank')" style="background:#f5e8ff;color:#553c9a">📖 Lexique</button>
+
+
+<!-- Bouton Lexique -->
+<button class="btn" onclick="window.open(SUBJECT_CONFIG.lexiqueFile,'_blank')" style="background:#f5e8ff;color:#553c9a">📖 Lexique</button>
+<!-- Fin Bouton Lexique -->
+ 
+
+
 </div>
+
 
 <!-- ACCUEIL -->
 <div id="accueil" class="section active">
-  <div class="home-title">English Master 🎓</div>
-  <div class="home-sub">Deviens champion de l'anglais, un niveau à la fois !</div>
+<div class="home-title">English Master 🎓</div>
+  <div class="home-sub">Deviens champion d'English, un niveau à la fois !</div>
   <div class="home-stats">
     <div class="home-stat"><div class="home-stat-num" id="homeLevel">1</div><div class="home-stat-label">Niveau</div></div>
     <div class="home-stat"><div class="home-stat-num" id="homeScore">0</div><div class="home-stat-label">Points</div></div>
@@ -1080,6 +1151,8 @@ function startLevel(levelNum){
   showLessonIntro(levelNum);
 }
 
+// Fonction showLessonIntro (correction CSS tassement)
+
 function showLessonIntro(levelNum){
   const lv=QUESTIONS_DB[levelNum];
   const lesson=LESSONS_DATA.find(l=>l.num===levelNum);
@@ -1096,18 +1169,17 @@ function showLessonIntro(levelNum){
   document.getElementById("lessonIntroTitle").textContent=lesson?lesson.title:lv.title;
   document.getElementById("lessonIntroObj").textContent=lv.objective;
   
-  let preview="";
+  const contentDiv = document.getElementById("lessonIntroContent");
   if(lesson){
-    const tmp=document.createElement("div");
-    tmp.innerHTML=lesson.content;
-    const text=tmp.textContent||tmp.innerText||"";
-    preview=text.substring(0,400).trim()+"...";
+    contentDiv.innerHTML = lesson.content;
   } else {
-    preview="Objectif : "+lv.objective;
+    contentDiv.innerHTML = "<p>Objectif : "+lv.objective+"</p>";
   }
-  document.getElementById("lessonIntroContent").textContent=preview;
-  document.getElementById("lessonIntroLexique").href="lexique.html?level="+levelNum;
+  
+  document.getElementById("lessonIntroLexique").href = SUBJECT_CONFIG.lexiqueFile + "?level=" + levelNum;
 }
+
+
 
 function startQuestions(){
   document.getElementById("lessonIntro").style.display="none";
@@ -1183,7 +1255,11 @@ function validateAnswer(){
   fb.className="feedback show "+(isCorrect?"correct-fb":"wrong-fb");
   document.getElementById("feedbackTitle").textContent=isCorrect?"✅ Bonne réponse !":"❌ Pas tout à fait…";
   document.getElementById("feedbackCorrect").textContent=isCorrect?"":"Bonne réponse : "+(q.correct||q.answer);
-  document.getElementById("feedbackExplanation").innerHTML=(q.explanation||"")+`<br><br><a href="lexique.html?level=${gameState.currentLevel}" target="_blank" style="color:var(--primary);font-size:.9em;font-weight:bold">📖 Voir le vocabulaire du niveau ${gameState.currentLevel}</a>`;
+
+// Lien lexique dans le feedback
+document.getElementById("feedbackExplanation").innerHTML=(q.explanation||"")+`<br><br><a href="${SUBJECT_CONFIG.lexiqueFile}?level=${gameState.currentLevel}" target="_blank" style="color:var(--primary);font-size:.9em;font-weight:bold">📖 Voir le vocabulaire du niveau ${gameState.currentLevel}</a>`;
+// Fin lien lexique
+ 
 
   // Stats
   gameState.answers.push({question:q.q,userAnswer,correct:q.correct||q.answer,isCorrect,explanation:q.explanation});
