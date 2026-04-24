@@ -215,80 +215,40 @@ body{background:linear-gradient(135deg,var(--primary),var(--secondary));min-heig
 
 /* 📱 Mobile : réduire padding pour les petits écrans fin de règle  */
 
-/* Adaptation mobile complète */
+/* Correction ciblée pour le tableau des articles (mobile uniquement) */
 @media (max-width: 600px) {
-    /* Conteneur principal */
-    .quiz-container {
-        padding: 12px;
-    }
-
-    /* Tableaux : mode scroll horizontal + colonnes adaptées */
+    /* Tableau des articles dans les leçons et l'intro */
     .lesson-table,
-    #lessonIntroContent table {
-        display: block;
-        overflow-x: auto;
+    #lessonIntroContent .lesson-table {
         width: 100%;
-        margin-bottom: 10px;
         border-collapse: collapse;
     }
 
-    /* Colonnes des tableaux */
-    .lesson-table th,
-    .lesson-table td,
-    #lessonIntroContent th,
-    #lessonIntroContent td {
-        min-width: 80px;
-        max-width: 120px;
-        padding: 4px 6px;
-        font-size: 0.75em;
+    /* Première colonne (T/H/E/⌀) : largeur fixe et texte centré */
+    .lesson-table th:first-child,
+    .lesson-table td:first-child,
+    #lessonIntroContent .lesson-table th:first-child,
+    #lessonIntroContent .lesson-table td:first-child {
+        width: 50px;
+        min-width: 50px;
+        max-width: 50px;
+        padding: 6px 2px;
+        font-size: 0.9em;
         text-align: center;
         white-space: normal;
         word-break: break-word;
-        border: 1px solid #e2e8f0;
     }
 
-    /* Boutons et inputs */
-    .btn,
-    .option-btn {
-        padding: 6px 12px;
-        font-size: 0.8em;
-        margin: 2px 0;
-    }
-
-    .answer-input {
+    /* Autres colonnes : texte légèrement réduit mais lisible */
+    .lesson-table th:not(:first-child),
+    .lesson-table td:not(:first-child),
+    #lessonIntroContent .lesson-table th:not(:first-child),
+    #lessonIntroContent .lesson-table td:not(:first-child) {
         padding: 8px;
         font-size: 0.9em;
+        text-align: center;
     }
-
-    /* Cartes et conteneurs */
-    .lesson-card,
-    .level-card {
-        padding: 12px;
-        margin-bottom: 8px;
-    }
-
-    /* Intro de leçon */
-    #lessonIntro {
-        padding: 12px;
-    }
-
-    #lessonIntroContent {
-        max-height: 35vh;
-        font-size: 0.85em;
-        padding: 10px;
-    }
-
-    /* Feedback */
-    .feedback {
-        padding: 10px;
-        font-size: 0.85em;
-    }
-
-    /* En-têtes */
-    .home-title {
-        font-size: 1.6em;
-    }
-}}
+}
  /* fin de modif des affichages pour écran petits  */
 
 </style>
