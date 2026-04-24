@@ -626,7 +626,7 @@ const QUESTIONS_DB = {
   ],
   libre:[
     {q:"I ___ (be) tired today.",answer:"am",alternatives:["'m"],explanation:"I + am."},
-    {q:"Traduis : 'J'ai 10 ans.'",answer:"I am 10",alternatives:["I'm 10","I am ten","I'm ten"],explanation:"Âge = TO BE. I am 10 years old."},
+{q:"Traduis : 'J'ai 10 ans.'",answer:"I am 10",alternatives:["I'm 10","I am ten","I'm ten","I am 10 years old","I'm 10 years old","I am 10 years"],explanation:"Âge = TO BE. I am 10 years old."}
     {q:"She ___ (have) blue eyes.",answer:"has",alternatives:["'s got","has got"],explanation:"She + has."},
     {q:"___ (be) they at school?",answer:"Are",alternatives:["are"],explanation:"They + Are (question)."},
     {q:"My parents ___ (be) teachers.",answer:"are",alternatives:["'re"],explanation:"Pluriel = are."},
@@ -1296,11 +1296,11 @@ function validateAnswer(){
     const inp=document.getElementById("answerInput");
     userAnswer=inp.value.trim();
     if(!userAnswer){showToast("Écris ta réponse !");return;}
-    const clean=userAnswer.toLowerCase().replace(/[.,;:!?']/g,"");
-    const cc=q.answer.toLowerCase().replace(/[.,;:!?']/g,"");
+const clean=userAnswer.toLowerCase().replace(/[.,;:!?']/g,"").replace(/\s+/g," ").trim();
+const cc=q.answer.toLowerCase().replace(/[.,;:!?']/g,"").replace(/\s+/g," ").trim();
     isCorrect=clean===cc;
     if(!isCorrect&&q.alternatives){
-      isCorrect=q.alternatives.some(a=>clean===a.toLowerCase().replace(/[.,;:!?']/g,""));
+  isCorrect=q.alternatives.some(a=>clean===a.toLowerCase().replace(/[.,;:!?']/g,"").replace(/\s+/g," ").trim());
     }
     inp.disabled=true; inp.className="answer-input "+(isCorrect?"correct":"wrong");
   }
