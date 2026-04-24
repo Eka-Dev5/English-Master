@@ -215,49 +215,67 @@ body{background:linear-gradient(135deg,var(--primary),var(--secondary));min-heig
 
 /* 📱 Mobile : réduire padding pour les petits écrans fin de règle  */
 
-/* Adaptation pour mobile */
+/* Adaptation mobile complète */
 @media (max-width: 600px) {
-    /* Réduction des marges et padding */
+    /* Conteneur principal */
     .quiz-container {
         padding: 12px;
     }
 
-    /* Tableaux plus compacts */
+    /* Tableaux : mode scroll horizontal + colonnes adaptées */
+    .lesson-table,
+    #lessonIntroContent table {
+        display: block;
+        overflow-x: auto;
+        width: 100%;
+        margin-bottom: 10px;
+        border-collapse: collapse;
+    }
+
+    /* Colonnes des tableaux */
     .lesson-table th,
     .lesson-table td,
     #lessonIntroContent th,
     #lessonIntroContent td {
+        min-width: 80px;
+        max-width: 120px;
         padding: 4px 6px;
-        font-size: 0.8em;
+        font-size: 0.75em;
+        text-align: center;
+        white-space: normal;
+        word-break: break-word;
+        border: 1px solid #e2e8f0;
     }
 
-    /* Boutons plus petits */
-    .btn {
+    /* Boutons et inputs */
+    .btn,
+    .option-btn {
         padding: 6px 12px;
         font-size: 0.8em;
+        margin: 2px 0;
     }
 
-    /* Cartes de leçons et niveaux */
-    .lesson-card,
-    .level-card {
-        padding: 12px;
-    }
-
-    /* En-têtes et titres */
-    .home-title {
-        font-size: 1.6em;
-    }
-
-    /* Options de QCM */
-    .option-btn {
-        padding: 8px;
-        font-size: 0.85em;
-    }
-
-    /* Zone de réponse libre */
     .answer-input {
         padding: 8px;
         font-size: 0.9em;
+    }
+
+    /* Cartes et conteneurs */
+    .lesson-card,
+    .level-card {
+        padding: 12px;
+        margin-bottom: 8px;
+    }
+
+    /* Intro de leçon */
+    #lessonIntro {
+        padding: 12px;
+    }
+
+    #lessonIntroContent {
+        max-height: 35vh;
+        font-size: 0.85em;
+        padding: 10px;
     }
 
     /* Feedback */
@@ -266,16 +284,11 @@ body{background:linear-gradient(135deg,var(--primary),var(--secondary));min-heig
         font-size: 0.85em;
     }
 
-    /* Intro de la leçon */
-    #lessonIntro {
-        padding: 12px;
+    /* En-têtes */
+    .home-title {
+        font-size: 1.6em;
     }
-
-    #lessonIntroContent {
-        max-height: 35vh;
-        font-size: 0.85em;
-    }
-}
+}}
  /* fin de modif des affichages pour écran petits  */
 
 </style>
