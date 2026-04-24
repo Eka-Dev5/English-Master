@@ -215,6 +215,69 @@ body{background:linear-gradient(135deg,var(--primary),var(--secondary));min-heig
 
 /* 📱 Mobile : réduire padding pour les petits écrans fin de règle  */
 
+/* Adaptation pour mobile */
+@media (max-width: 600px) {
+    /* Réduction des marges et padding */
+    .quiz-container {
+        padding: 12px;
+    }
+
+    /* Tableaux plus compacts */
+    .lesson-table th,
+    .lesson-table td,
+    #lessonIntroContent th,
+    #lessonIntroContent td {
+        padding: 4px 6px;
+        font-size: 0.8em;
+    }
+
+    /* Boutons plus petits */
+    .btn {
+        padding: 6px 12px;
+        font-size: 0.8em;
+    }
+
+    /* Cartes de leçons et niveaux */
+    .lesson-card,
+    .level-card {
+        padding: 12px;
+    }
+
+    /* En-têtes et titres */
+    .home-title {
+        font-size: 1.6em;
+    }
+
+    /* Options de QCM */
+    .option-btn {
+        padding: 8px;
+        font-size: 0.85em;
+    }
+
+    /* Zone de réponse libre */
+    .answer-input {
+        padding: 8px;
+        font-size: 0.9em;
+    }
+
+    /* Feedback */
+    .feedback {
+        padding: 10px;
+        font-size: 0.85em;
+    }
+
+    /* Intro de la leçon */
+    #lessonIntro {
+        padding: 12px;
+    }
+
+    #lessonIntroContent {
+        max-height: 35vh;
+        font-size: 0.85em;
+    }
+}
+ /* fin de modif des affichages pour écran petits  */
+
 </style>
 </head>
 <body>
