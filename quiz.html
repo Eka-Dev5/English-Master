@@ -269,11 +269,12 @@ body{background:linear-gradient(135deg,var(--primary),var(--secondary));min-heig
   <button class="btn btn-primary" onclick="showSection('accueil')">🏠</button>
   <button class="btn" onclick="showSection('lecons')" style="background:#f0f4ff;color:var(--primary)">📚 Leçons</button>
   <button class="btn" onclick="showSection('niveaux')" style="background:#f0fff4;color:#276749">🎮 Niveaux</button>
-  <button class="btn" onclick="window.open('dashboard.html','_blank')" style="background:#fff5d6;color:#744210">📊 Espace</button>
+<button class="btn" onclick="window.location.href='dashboard.html'" style="background:#fff5d6;color:#744210">📊 Espace</button>
 
 
 <!-- Bouton Lexique -->
-<button class="btn" onclick="window.open(SUBJECT_CONFIG.lexiqueFile,'_blank')" style="background:#f5e8ff;color:#553c9a">📖 Lexique</button>
+<button class="btn" onclick="window.location.href=SUBJECT_CONFIG.lexiqueFile"
+ style="background:#f5e8ff;color:#553c9a">📖 Lexique</button>
 <!-- Fin Bouton Lexique -->
  
 
@@ -1191,9 +1192,35 @@ function renderLevels(){
 // JEU
 // ═══════════════════════════════════════════════════════════════════
 function startLevel(levelNum){
-  if(!gameState.currentPlayer){showToast("Crée ou choisis un joueur d'abord !");return;}
-  gameState.currentLevel=levelNum;
-  gameState.currentQuestionIndex=0; gameState.answers=[]; gameState.selectedOption=null;
+
+// Reprise session en cours
+
+if(!gameState.currentPlayer){
+  const players=getPlayers();
+  const names=Object.keys(players);
+  if(names.length>0){switchPlayer(names[0]);}
+  else {showToast("Crée ou choisis un joueur d'abord !");return;}
+}
+gameState.currentLevel=levelNum;
+
+const players=getPlayers();
+const p=players[gameState.currentPlayer];
+if(p&&p.activeSession&&p.activeSession.level===levelNum&&p.activeSession.answers&&p.activeSession.answers.length>0){
+  if(confirm("Tu as une session en cours pour ce niveau ("+p.activeSession.answers.length+"/"+p.activeSession.questions.length+" questions). Reprendre où tu t'étais arrêté ?")){
+    gameState.questions=p.activeSession.questions;
+    gameState.currentQuestionIndex=p.activeSession.currentQuestionIndex;
+    gameState.answers=p.activeSession.answers;
+    gameState.selectedOption=null;
+    document.getElementById("gameTitle").textContent="Niveau "+levelNum+" : "+QUESTIONS_DB[levelNum].title;
+    showSection("jeu");
+    renderQuestion();
+    return;
+  }
+}
+gameState.currentQuestionIndex=0; gameState.answers=[]; gameState.selectedOption=null;
+
+// Fin const. Reprise session en cours
+
   const lv=QUESTIONS_DB[levelNum];
   const allQcm=lv.qcm.map(q=>({...q,type:"qcm"}));
   const allLibre=lv.libre.map(q=>({...q,type:"libre"}));
@@ -1331,7 +1358,14 @@ document.getElementById("feedbackExplanation").innerHTML=(q.explanation||"")+`<b
   document.getElementById("nextBtn").style.display="inline-block";
   document.getElementById("nextBtn").textContent=
     gameState.currentQuestionIndex===gameState.questions.length-1?"Voir les résultats →":"Suivant →";
+    // Sauvegarde session en cours 
+
+  saveActiveSession();
+
+    // Fin Sauvegarde session en cours 
+
 }
+
 function trackError(question,userAnswer){
   if(!gameState.currentPlayer)return;
   const players=getPlayers();
@@ -1341,6 +1375,24 @@ function trackError(question,userAnswer){
   if(p.errorHistory.length>50)p.errorHistory=p.errorHistory.slice(-50);
   savePlayers(players);
 }
+  // Sauvegarde session en cours
+
+function saveActiveSession(){
+  if(!gameState.currentPlayer)return;
+  const players=getPlayers();
+  const p=players[gameState.currentPlayer];
+  p.activeSession={
+    level:gameState.currentLevel,
+    questions:gameState.questions,
+    currentQuestionIndex:gameState.currentQuestionIndex,
+    answers:gameState.answers,
+    mode:gameState.currentMode,
+    date:new Date().toISOString()
+  };
+  savePlayers(players);
+}
+// Fin Sauvegarde session en cours
+
 function nextQuestion(){
   if(gameState.currentQuestionIndex>=gameState.questions.length-1) showResults();
   else{gameState.currentQuestionIndex++; renderQuestion();}
@@ -1354,6 +1406,28 @@ function showResults(){
   document.getElementById("resultMsg").textContent=msg+" ("+correct+"/"+total+" bonnes réponses)";
   const players=getPlayers();
   const p=players[gameState.currentPlayer];
+
+// Correction Historique des sessions
+
+if(p){
+  if(!p.sessionHistory)p.sessionHistory=[];
+  p.sessionHistory.push({
+    date:new Date().toISOString(),
+    level:gameState.currentLevel,
+    levelTitle:QUESTIONS_DB[gameState.currentLevel].title,
+    correct:correct,
+    total:total,
+    pct:pct,
+    passed:pct>=80,
+    mode:gameState.currentMode
+  });
+  if(p.sessionHistory.length>50)p.sessionHistory=p.sessionHistory.slice(-50);
+  p.activeSession=null;
+  p.lastPlayed=new Date().toISOString();
+}
+
+//Fin correction Historique des sessions
+
   if(pct>=80&&p){
     if(!p.completed.includes(gameState.currentLevel))p.completed.push(gameState.currentLevel);
     if(p.currentLevel<=gameState.currentLevel&&gameState.currentLevel<10)p.currentLevel=gameState.currentLevel+1;
@@ -1370,9 +1444,11 @@ function startNextLevel(){
   if(nlvl<=10)startLevel(nlvl); else showToast("Félicitations ! Tu as tout terminé ! 🏆");
 }
 function quitGame(){
-  if(confirm("Quitter ? Ta progression dans ce niveau sera perdue."))showSection("niveaux");
+if(confirm("Quitter ? Ta progression sera sauvegardée et tu pourras la reprendre plus tard.")){
+  saveActiveSession();
+  showSection("niveaux");
+  }
 }
-
 // ═══════════════════════════════════════════════════════════════════
 // EXPORT / IMPORT SAUVEGARDE
 // ═══════════════════════════════════════════════════════════════════
@@ -1422,11 +1498,31 @@ function showToast(msg){
 // ═══════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════
+
+    // Auto-créer un joueur par défaut pour éviter le blocage
+
 document.addEventListener("DOMContentLoaded",()=>{
   renderLessons(); renderLevels(); updatePlayerDisplay();
   const players=getPlayers(); const names=Object.keys(players);
-  if(names.length>0)switchPlayer(names[0]);
+  if(names.length>0){
+    switchPlayer(names[0]);
+  } else {
+    const defaultName="Joueur 1";
+    players[defaultName]={name:defaultName,currentLevel:1,score:0,completed:[],totalQuestions:0,totalCorrect:0,streak:0,lastPlayed:new Date().toISOString(),errorHistory:[],sessionHistory:[],activeSession:null};
+    savePlayers(players);
+    switchPlayer(defaultName);
+    showToast("Bienvenue ! Joueur créé automatiquement.");
+  }
+  const params=new URLSearchParams(window.location.search);
+  const lvlParam=params.get('level');
+  if(lvlParam){
+    const lvl=parseInt(lvlParam);
+    if(lvl>=1&&lvl<=10){setTimeout(()=>startLevel(lvl),300);}
+  }
 });
+
+// Fin auto création joueur pour éviter les retours anonymes
+  
 </script>
 </body>
 </html>

@@ -83,8 +83,10 @@ h1{text-align:center;color:var(--primary);font-size:2.1em;margin-bottom:4px}
 
 <div class="player-header no-print">
   <select id="playerSelect" onchange="loadPlayer(this.value)"><option value="">-- Choisir un joueur --</option></select>
-<button class="btn btn-primary" onclick="window.location.href='quiz.html'">🎮 Retour au quiz</button>
-  <button class="btn btn-link" onclick="window.open('lexique.html','_blank')">📖 Lexique</button>
+
+<button class="btn btn-primary" onclick="window.location.href='quiz.html'">🎮 Quiz</button>
+
+<button class="btn btn-link" onclick="window.location.href='lexique.html'">📖 Lexique</button>
 </div>
 <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px" class="no-print">
   <button class="btn" onclick="exportSave()" style="flex:1;background:#f0fff4;color:#276749;font-size:.85em">⬇️ Exporter ma sauvegarde</button>
@@ -98,7 +100,11 @@ h1{text-align:center;color:var(--primary);font-size:2.1em;margin-bottom:4px}
   <button class="tab-btn active" onclick="showTab('stats',this)">📈 Statistiques</button>
   <button class="tab-btn" onclick="showTab('badges',this)">🏅 Badges (<span id="badgeCount">0</span>/30)</button>
   <button class="tab-btn" onclick="showTab('cameleon',this)">🎭 Mode Caméléon</button>
-  <button class="tab-btn" onclick="showTab('fiches',this)">📝 Mes Fiches</button>
+<button class="tab-btn" onclick="showTab('niveaux',this)">🎮 Mes Niveaux</button>
+<button class="tab-btn" onclick="showTab('fiches',this)">📝 Mes Fiches</button>
+
+<button class="tab-btn" onclick="showTab('historique',this)">📜 Historique</button>
+
 </div>
 
 <!-- STATS -->
@@ -132,11 +138,26 @@ h1{text-align:center;color:var(--primary);font-size:2.1em;margin-bottom:4px}
 </div>
 
 <!-- FICHES -->
+
+
 <div id="fiches" class="tab-content">
   <button class="print-btn no-print" onclick="window.print()">🖨️ Imprimer mes fiches</button>
   <div id="fichesContent"></div>
 </div>
+
+<!-- NIVEAUX -->
+<div id="niveaux" class="tab-content">
+  <div class="no-print-info">Clique sur un niveau pour jouer.</div>
+  <div id="niveauxGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:10px"></div>
 </div>
+
+<!-- HISTORIQUE -->
+<div id="historique" class="tab-content">
+  <div class="no-print-info">Historique de tes sessions.</div>
+  <div id="historiqueContent"></div>
+</div>
+</div>
+
 
 <script>
 const STORAGE_KEY = "englishMaster_v4";
@@ -258,8 +279,15 @@ function showTab(id,btn){
   document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   if(btn)btn.classList.add("active");
-  if(id==="cameleon")renderCameleon();
-  if(id==="fiches")renderFiches();
+  
+
+
+
+if(id==="cameleon")renderCameleon();
+if(id==="fiches")renderFiches();
+if(id==="niveaux")renderNiveaux();
+if(id==="historique")renderHistorique();
+
 }
 
 function renderAll(){
@@ -273,6 +301,7 @@ function renderAll(){
   renderLevelBars();
   renderBadges();
 }
+
 
 function renderLevelBars(){
   const p=currentPlayerData;
@@ -293,6 +322,7 @@ function renderLevelBars(){
   document.getElementById("levelBars").innerHTML=h;
 }
 
+
 function renderBadges(){
   const p=currentPlayerData;
   let unlocked=0;
@@ -309,6 +339,7 @@ function renderBadges(){
   document.getElementById("badgeCount").textContent=unlocked;
 }
 
+
 function renderCameleon(){
   const p=currentPlayerData;
   const ex=CAMELEON_EXERCISES[camIdx%CAMELEON_EXERCISES.length];
@@ -324,6 +355,7 @@ function renderCameleon(){
     <div style="margin-top:12px;font-size:.85em;color:#718096">Lucas aidé ${helped} fois ✅</div>`;
   document.getElementById("camScore").textContent="";
 }
+
 
 function checkCameleon(idx){
   const ex=CAMELEON_EXERCISES[camIdx%CAMELEON_EXERCISES.length];
@@ -347,10 +379,12 @@ function checkCameleon(idx){
   }
 }
 
+
 function nextCameleon(){
   camIdx++;
   renderCameleon();
 }
+
 
 function renderFiches(){
   const p=currentPlayerData;
@@ -370,6 +404,49 @@ function renderFiches(){
 }
 
 document.addEventListener("DOMContentLoaded",()=>{loadPlayerList();});
+
+
+function renderNiveaux(){
+  const p=currentPlayerData;
+  const c=document.getElementById("niveauxGrid");
+  if(!p){c.innerHTML="<div class='cam-no-errors'>Connecte-toi d'abord.</div>";return;}
+  const completed=p.completed||[];
+  const current=p.currentLevel||1;
+  const activeSession=p.activeSession;
+  const LEVEL_NAMES={1:"Décollage 🚀",2:"Routine 📅",3:"En ce moment 👁️",4:"Questions ❓",5:"Retour ⏪",6:"Aventurier ⚔️",7:"Voyant 🔮",8:"Expériences 🏆",9:"Pouvoirs 🪄",10:"Maîtrise 👑"};
+  let h="";
+  for(let i=1;i<=10;i++){
+    const done=completed.includes(i);
+    const isCur=i===current&&!done;
+    const locked=i>current&&!done;
+    const hasSession=activeSession&&activeSession.level===i;
+    let cls="level-card",status="";
+    if(locked){cls+=" locked";status="🔒 Verrouillé";}
+    else if(done){cls+=" completed";status="✅ Terminé";}
+    else if(isCur){cls+=" current";status="🎯 En cours";}
+    else{status="▶️ Disponible";}
+    if(hasSession)status+=" 📝 Session en cours";
+    h+=`<div class="${cls}" style="cursor:${locked?'not-allowed':'pointer'}" onclick="${locked?'':'launchLevel('+i+')'}"><div style="font-weight:bold">Niveau ${i}</div><div style="font-size:.9em">${LEVEL_NAMES[i]}</div><div style="font-size:.75em">${status}</div>${hasSession?`<div style="font-size:.7em;color:var(--warning)">⏸️ Q${activeSession.currentQuestionIndex+1}/${activeSession.questions.length}</div>`:""}</div>`;
+  }
+  c.innerHTML=h;
+}
+function launchLevel(lvl){window.location.href="quiz.html?level="+lvl;}
+function renderHistorique(){
+  const p=currentPlayerData;
+  const c=document.getElementById("historiqueContent");
+  if(!p||!p.sessionHistory||p.sessionHistory.length===0){c.innerHTML="<div class='cam-no-errors'>📭 Aucune session enregistrée.</div>";return;}
+  const sessions=p.sessionHistory.slice().reverse();
+  c.innerHTML=`<p style="color:#718096">${sessions.length} session(s)</p>`+sessions.map(s=>{
+    const d=new Date(s.date);
+    const dateStr=d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+    const timeStr=d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    const color=s.passed?"var(--success)":"var(--error)";
+    return `<div class="fiche-card" style="border-left-color:${color}"><div style="display:flex;justify-content:space-between"><span style="font-weight:bold">Niveau ${s.level}</span><span style="font-size:.8em">${dateStr} ${timeStr}</span></div><div style="font-size:.9em"><span style="color:${color};font-weight:bold">${s.passed?"✅ Réussi":"❌ À réviser"}</span> | ${s.correct}/${s.total} (${s.pct}%) | ${s.mode||'mixte'}</div></div>`;
+  }).join("");
+}
+
+
+
 </script>
 </body>
 </html>
