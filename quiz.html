@@ -256,13 +256,23 @@ body{background:linear-gradient(135deg,var(--primary),var(--secondary));min-heig
       <div class="player-stats" id="playerStats">Connecte-toi !</div>
     </div>
   </div>
+
   <div class="player-selector">
     <select id="playerSelect" onchange="switchPlayer(this.value)"><option value="">-- Joueur --</option></select>
-    <button class="btn btn-primary" onclick="createNewPlayer()">+ Nouveau</button>
+    <button class="btn btn-primary" onclick="showNewPlayerModal()">+ Nouveau</button>
     <button class="btn btn-danger" onclick="deleteCurrentPlayer()">✕</button>
   </div>
+  <div id="newPlayerInput" style="display:none;margin-top:8px">
+    <input type="text" id="newPlayerName" placeholder="Prénom du joueur" style="padding:8px 12px;border:2px solid #e2e8f0;border-radius:10px;font-size:.95em;flex:1" onkeyup="if(event.key==='Enter')confirmNewPlayer()">
+    <button class="btn btn-primary" onclick="confirmNewPlayer()" style="margin-left:8px">✓</button>
+    <button class="btn" onclick="hideNewPlayerInput()" style="margin-left:4px;background:#f8fafc">✕</button>
+  </div>
+
+
   <div class="header-score" id="headerScore">0 pts</div>
 </div>
+
+
 
 <!-- NAV -->
 <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
@@ -399,6 +409,19 @@ body{background:linear-gradient(135deg,var(--primary),var(--secondary));min-heig
       <button class="btn" onclick="retryLevel()" style="background:#f8fafc">🔁 Rejouer</button>
       <button class="btn btn-primary" id="nextLevelBtn" onclick="startNextLevel()" style="display:none">Niveau suivant →</button>
       <button class="btn" onclick="showSection('niveaux')" style="background:#f0f4ff;color:var(--primary)">Tous les niveaux</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE NOUVEAU JOUEUR -->
+<div id="newPlayerModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:15px">
+  <div style="background:white;padding:25px;border-radius:20px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+    <div style="font-size:2.5em;margin-bottom:10px">👤</div>
+    <h3 style="margin-bottom:15px;color:var(--text)">Nouveau joueur</h3>
+    <input type="text" id="newPlayerName" placeholder="Ton prénom" style="width:100%;padding:14px;border:2px solid #e2e8f0;border-radius:12px;font-size:1.1em;margin-bottom:18px;outline:none" onkeyup="if(event.key==='Enter')confirmNewPlayer()">
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" onclick="confirmNewPlayer()" style="flex:1;padding:12px">✓ Créer</button>
+      <button class="btn" onclick="closeNewPlayerModal()" style="flex:1;padding:12px;background:#f8fafc;color:#718096">✕ Annuler</button>
     </div>
   </div>
 </div>
@@ -1084,19 +1107,27 @@ function switchPlayer(name){
   gameState.score=p.score||0;
   updatePlayerDisplay(); renderLevels(); showToast("Joueur : "+name);
 }
-function createNewPlayer(){
-  const name=prompt("Nom du joueur (prénom) :");
-  if(!name||!name.trim()){return;}
+
+function showNewPlayerModal(){
+  document.getElementById("newPlayerModal").style.display="flex";
+  document.getElementById("newPlayerName").value="";
+}
+function closeNewPlayerModal(){
+  document.getElementById("newPlayerModal").style.display="none";
+}
+function confirmNewPlayer(){
+  const name=document.getElementById("newPlayerName").value;
+  if(!name||!name.trim()){closeNewPlayerModal();return;}
   const n=name.trim();
   const players=getPlayers();
-  if(players[n]){alert("Ce joueur existe déjà !");return;}
-
-
+  if(players[n]){showToast("Ce joueur existe déjà !");return;}
   players[n]={name:n,currentLevel:1,score:0,completed:[],totalQuestions:0,totalCorrect:0,streak:0,lastPlayed:null,errorHistory:[],sessionHistory:[],activeSession:null};
-
-
   savePlayers(players); switchPlayer(n);
+  closeNewPlayerModal();
+  showToast("Bienvenue "+n+" ! 🎉");
 }
+
+
 function deleteCurrentPlayer(){
   if(!gameState.currentPlayer){showToast("Aucun joueur sélectionné");return;}
   if(!confirm("Supprimer "+gameState.currentPlayer+" ? Toute sa progression sera perdue."))return;
