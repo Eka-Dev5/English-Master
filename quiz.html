@@ -1069,7 +1069,11 @@ function getPlayers(){try{return JSON.parse(localStorage.getItem(SUBJECT_CONFIG.
 function savePlayers(p){localStorage.setItem(SUBJECT_CONFIG.playersKey,JSON.stringify(p));}
 function getPlayerData(name){
   const p=getPlayers();
-  if(!p[name])p[name]={name,currentLevel:1,score:0,completed:[],totalQuestions:0,totalCorrect:0,streak:0,lastPlayed:null,errorHistory:[]};
+  
+
+if(!p[name])p[name]={name,currentLevel:1,score:0,completed:[],totalQuestions:0,totalCorrect:0,streak:0,lastPlayed:null,errorHistory:[],sessionHistory:[],activeSession:null};
+
+
   savePlayers(p); return p[name];
 }
 function switchPlayer(name){
@@ -1086,7 +1090,11 @@ function createNewPlayer(){
   const n=name.trim();
   const players=getPlayers();
   if(players[n]){alert("Ce joueur existe déjà !");return;}
-  players[n]={name:n,currentLevel:1,score:0,completed:[],totalQuestions:0,totalCorrect:0,streak:0,lastPlayed:null,errorHistory:[]};
+
+
+  players[n]={name:n,currentLevel:1,score:0,completed:[],totalQuestions:0,totalCorrect:0,streak:0,lastPlayed:null,errorHistory:[],sessionHistory:[],activeSession:null};
+
+
   savePlayers(players); switchPlayer(n);
 }
 function deleteCurrentPlayer(){
