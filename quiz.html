@@ -1375,11 +1375,12 @@ function validateAnswer(){
     const inp=document.getElementById("answerInput");
     userAnswer=inp.value.trim();
     if(!userAnswer){showToast("Écris ta réponse !");return;}
-const clean=userAnswer.toLowerCase().replace(/[.,;:!?']/g,"").replace(/\s+/g," ").trim();
-const cc=q.answer.toLowerCase().replace(/[.,;:!?']/g,"").replace(/\s+/g," ").trim();
+const normalize=s=>s.toLowerCase().replace(/['’‘`´]/g,'').replace(/[.,;:!?]/g,'').replace(/\s+/g,' ').trim();
+const clean=normalize(userAnswer);
+const cc=normalize(q.answer);
     isCorrect=clean===cc;
     if(!isCorrect&&q.alternatives){
-  isCorrect=q.alternatives.some(a=>clean===a.toLowerCase().replace(/[.,;:!?']/g,"").replace(/\s+/g," ").trim());
+  isCorrect=q.alternatives.some(a=>clean===normalize(a));
     }
     inp.disabled=true; inp.className="answer-input "+(isCorrect?"correct":"wrong");
   }
