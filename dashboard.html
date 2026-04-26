@@ -253,30 +253,31 @@ function importSave(event){
 function getPlayers(){try{return JSON.parse(localStorage.getItem(PLAYERS_KEY))||{};}catch(e){return {};}}
 function savePlayers(p){localStorage.setItem(PLAYERS_KEY,JSON.stringify(p));}
 
-function loadPlayerList(){
-  const sel=document.getElementById("playerSelect");
-  const players=getPlayers();
-  sel.innerHTML="<option value=''>-- Choisir un joueur --</option>";
-  Object.keys(players).forEach(n=>{
-    const o=document.createElement("option"); o.value=n;
-    o.textContent=n+" (Niv."+players[n].currentLevel+")";
+function loadPlayerList() {
+  const sel     = document.getElementById("playerSelect");
+  const players = getPlayers();
+  const names   = Object.keys(players);
+
+  // Remplir le <select> avec tous les joueurs existants
+  sel.innerHTML = "<option value=''>-- Choisir un joueur --</option>";
+  names.forEach(n => {
+    const o = document.createElement("option");
+    o.value = n;
+    o.textContent = n + " (Niv." + players[n].currentLevel + ")";
     sel.appendChild(o);
   });
-  
-  // ⬇️ LIRE LE JOUEUR DEPUIS L'URL
-  const params=new URLSearchParams(window.location.search);
-  const urlPlayer=params.get('player');
-  const names=Object.keys(players);
-  
-  if(urlPlayer && players[urlPlayer]){
-    sel.value=urlPlayer;
+
+  // Priorité : joueur passé dans l'URL (?player=Prénom) → sinon premier de la liste
+  const urlPlayer = new URLSearchParams(window.location.search).get('player');
+
+  if (urlPlayer && players[urlPlayer]) {
+    sel.value = urlPlayer;
     loadPlayer(urlPlayer);
-  } else if(names.length>0){
-    sel.value=names[0];
+  } else if (names.length > 0) {
+    sel.value = names[0];
     loadPlayer(names[0]);
   }
 }
-  // ⬇️ FIN FONCTION LIRE LE JOUEUR DEPUIS L'URL
 
 function loadPlayer(name){
   if(!name){currentPlayerData=null;return;}
@@ -449,14 +450,13 @@ function renderNiveaux(){
 }
   // Retour quiz vers Dashboard avec joueur conservé 
 
-function launchLevel(lvl){
-  if(currentPlayerName){
-    window.location.href="quiz.html?level="+lvl+"&player="+encodeURIComponent(currentPlayerName);
-  } else {
-    window.location.href="quiz.html?level="+lvl;
-  }
+function launchLevel(lvl) {
+  // Passe le joueur actif dans l'URL pour que le quiz le charge directement
+  const playerParam = currentPlayerName
+    ? "&player=" + encodeURIComponent(currentPlayerName)
+    : "";
+  window.location.href = "quiz.html?level=" + lvl + playerParam;
 }
-  // Fon fonction Retour quiz vers Dashboard avec joueur conservé 
 
 function renderHistorique(){
   const p=currentPlayerData;

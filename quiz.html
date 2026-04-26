@@ -1575,43 +1575,50 @@ function goToDashboard(){
 
     // Auto-créer un joueur par défaut pour éviter le blocage
 
-document.addEventListener("DOMContentLoaded",()=>{
-  renderLessons(); renderLevels(); updatePlayerDisplay();
-  const players=getPlayers(); const names=Object.keys(players);
-  if(names.length>0){
-    switchPlayer(names[0]);
-  } else {
-    const defaultName="Joueur 1";
-    players[defaultName]={name:defaultName,currentLevel:1,score:0,completed:[],totalQuestions:0,totalCorrect:0,streak:0,lastPlayed:new Date().toISOString(),errorHistory:[],sessionHistory:[],activeSession:null};
-    savePlayers(players);
-    switchPlayer(defaultName);
-    showToast("Bienvenue ! Joueur créé automatiquement.");
-  }
-  const params=new URLSearchParams(window.location.search);
-  
-  // ⬇️ PRIORITÉ AU JOUEUR PASSÉ DANS L'URL
+document.addEventListener("DOMContentLoaded", () => {
 
- const urlPlayer=params.get('player');
-  
- if(urlPlayer && players[urlPlayer]){
+  // ── Rendu initial de l'interface ──────────────────────────────────
+  renderLessons();
+  renderLevels();
+  updatePlayerDisplay();
+
+  // ── Lecture des paramètres URL (?player=Prénom&level=3) ───────────
+  const params    = new URLSearchParams(window.location.search);
+  const urlPlayer = params.get('player');
+  const lvlParam  = params.get('level');
+
+  // ── Chargement du joueur : URL en priorité, sinon premier de la liste
+  const players = getPlayers();
+  const names   = Object.keys(players);
+
+  if (urlPlayer && players[urlPlayer]) {
+    // Cas 1 : un joueur précis est passé depuis le dashboard ou un lien
     switchPlayer(urlPlayer);
-  } else if(names.length>0){
+
+  } else if (names.length > 0) {
+    // Cas 2 : aucun joueur dans l'URL → on prend le premier de la liste
     switchPlayer(names[0]);
+
   } else {
-    const defaultName="Joueur 1";
-    players[defaultName]={name:defaultName,currentLevel:1,score:0,completed:[],totalQuestions:0,totalCorrect:0,streak:0,lastPlayed:new Date().toISOString(),errorHistory:[],sessionHistory:[],activeSession:null};
+    // Cas 3 : aucun joueur existant → création automatique de "Joueur 1"
+    const defaultName = "Joueur 1";
+    players[defaultName] = {
+      name: defaultName, currentLevel: 1, score: 0,
+      completed: [], totalQuestions: 0, totalCorrect: 0,
+      streak: 0, lastPlayed: new Date().toISOString(),
+      errorHistory: [], sessionHistory: [], activeSession: null
+    };
     savePlayers(players);
     switchPlayer(defaultName);
     showToast("Bienvenue ! Joueur créé automatiquement.");
   }
-  
-  // ⬇️ FIN PRIORITÉ AU JOUEUR PASSÉ DANS L'URL
 
-  const lvlParam=params.get('level');
-  if(lvlParam){
-    const lvl=parseInt(lvlParam);
-    if(lvl>=1&&lvl<=10){setTimeout(()=>startLevel(lvl),300);}
+  // ── Démarrage automatique d'un niveau si demandé par l'URL ────────
+  if (lvlParam) {
+    const lvl = parseInt(lvlParam);
+    if (lvl >= 1 && lvl <= 10) { setTimeout(() => startLevel(lvl), 300); }
   }
+
 });
 
   const lvlParam=params.get('level');
