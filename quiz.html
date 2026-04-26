@@ -1488,20 +1488,13 @@ if(p){
       if(p.currentLevel<=gameState.currentLevel&&gameState.currentLevel<10)p.currentLevel=gameState.currentLevel+1;
       p.score=(p.score||0)+correct*10;
     }
-    savePlayers(players);  // ← Toujours sauvegarder
-    // ⬆️ FIN MODIF
-}
-
-//Fin correction Historique des sessions
-
-  if(pct>=80&&p){
-    if(!p.completed.includes(gameState.currentLevel))p.completed.push(gameState.currentLevel);
-    if(p.currentLevel<=gameState.currentLevel&&gameState.currentLevel<10)p.currentLevel=gameState.currentLevel+1;
-    p.score=(p.score||0)+correct*10;
     savePlayers(players);
-    document.getElementById("nextLevelBtn").style.display="inline-block";
-  } else document.getElementById("nextLevelBtn").style.display="none";
-  updatePlayerDisplay(); showSection("resultats");
+  }
+
+  // Affichage bouton niveau suivant
+  document.getElementById("nextLevelBtn").style.display = pct >= 80 ? "inline-block" : "none";
+  updatePlayerDisplay();
+  showSection("resultats");
 }
 function retryLevel(){startLevel(gameState.currentLevel);}
 function startNextLevel(){
@@ -1621,15 +1614,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-  const lvlParam=params.get('level');
-  if(lvlParam){
-    const lvl=parseInt(lvlParam);
-    if(lvl>=1&&lvl<=10){setTimeout(()=>startLevel(lvl),300);}
-  }
-});
+// Fin init
 
-// Fin auto création joueur pour éviter les retours anonymes
-  
 </script>
 
 </body>
