@@ -262,9 +262,21 @@ function loadPlayerList(){
     o.textContent=n+" (Niv."+players[n].currentLevel+")";
     sel.appendChild(o);
   });
+  
+  // ⬇️ LIRE LE JOUEUR DEPUIS L'URL
+  const params=new URLSearchParams(window.location.search);
+  const urlPlayer=params.get('player');
   const names=Object.keys(players);
-  if(names.length>0){sel.value=names[0];loadPlayer(names[0]);}
+  
+  if(urlPlayer && players[urlPlayer]){
+    sel.value=urlPlayer;
+    loadPlayer(urlPlayer);
+  } else if(names.length>0){
+    sel.value=names[0];
+    loadPlayer(names[0]);
+  }
 }
+  // ⬇️ FIN FONCTION LIRE LE JOUEUR DEPUIS L'URL
 
 function loadPlayer(name){
   if(!name){currentPlayerData=null;return;}
@@ -411,7 +423,6 @@ function renderFiches(){
 
 document.addEventListener("DOMContentLoaded",()=>{loadPlayerList();});
 
-
 function renderNiveaux(){
   const p=currentPlayerData;
   const c=document.getElementById("niveauxGrid");
@@ -436,7 +447,17 @@ function renderNiveaux(){
   }
   c.innerHTML=h;
 }
-function launchLevel(lvl){window.location.href="quiz.html?level="+lvl;}
+  // Retour quiz vers Dashboard avec joueur conservé 
+
+function launchLevel(lvl){
+  if(currentPlayerName){
+    window.location.href="quiz.html?level="+lvl+"&player="+encodeURIComponent(currentPlayerName);
+  } else {
+    window.location.href="quiz.html?level="+lvl;
+  }
+}
+  // Fon fonction Retour quiz vers Dashboard avec joueur conservé 
+
 function renderHistorique(){
   const p=currentPlayerData;
   const c=document.getElementById("historiqueContent");

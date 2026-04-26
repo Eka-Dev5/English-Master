@@ -282,7 +282,12 @@ word-break: break-word;
   <button class="btn btn-primary" onclick="showSection('accueil')">🏠</button>
   <button class="btn" onclick="showSection('lecons')" style="background:#f0f4ff;color:var(--primary)">📚 Leçons</button>
   <button class="btn" onclick="showSection('niveaux')" style="background:#f0fff4;color:#276749">🎮 Niveaux</button>
-<button class="btn" onclick="window.location.href='dashboard.html'" style="background:#fff5d6;color:#744210">📊 Espace</button>
+  
+<!-- Bouton pour se rendre à l'espace  -->
+<button class="btn" 
+  onclick="goToDashboard()" 
+  style="background:#fff5d6;color:#744210
+">📊 Espace</button>
 
 <!-- Bouton Lexique -->
 
@@ -1556,6 +1561,14 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove("show"),3000);
 }
 
+function goToDashboard(){
+  if(gameState.currentPlayer){
+    window.location.href='dashboard.html?player='+encodeURIComponent(gameState.currentPlayer);
+  } else {
+    window.location.href='dashboard.html';
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════
@@ -1575,6 +1588,32 @@ document.addEventListener("DOMContentLoaded",()=>{
     showToast("Bienvenue ! Joueur créé automatiquement.");
   }
   const params=new URLSearchParams(window.location.search);
+  
+  // ⬇️ PRIORITÉ AU JOUEUR PASSÉ DANS L'URL
+
+ const urlPlayer=params.get('player');
+  
+ if(urlPlayer && players[urlPlayer]){
+    switchPlayer(urlPlayer);
+  } else if(names.length>0){
+    switchPlayer(names[0]);
+  } else {
+    const defaultName="Joueur 1";
+    players[defaultName]={name:defaultName,currentLevel:1,score:0,completed:[],totalQuestions:0,totalCorrect:0,streak:0,lastPlayed:new Date().toISOString(),errorHistory:[],sessionHistory:[],activeSession:null};
+    savePlayers(players);
+    switchPlayer(defaultName);
+    showToast("Bienvenue ! Joueur créé automatiquement.");
+  }
+  
+  // ⬇️ FIN PRIORITÉ AU JOUEUR PASSÉ DANS L'URL
+
+  const lvlParam=params.get('level');
+  if(lvlParam){
+    const lvl=parseInt(lvlParam);
+    if(lvl>=1&&lvl<=10){setTimeout(()=>startLevel(lvl),300);}
+  }
+});
+
   const lvlParam=params.get('level');
   if(lvlParam){
     const lvl=parseInt(lvlParam);
