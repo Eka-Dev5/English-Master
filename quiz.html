@@ -1350,7 +1350,8 @@ function renderQuestion(){
     document.getElementById("qcmOptions").style.display="grid";
     document.getElementById("libreInput").style.display="none";
     const g=document.getElementById("qcmOptions");
-    g.innerHTML=q.options.map(opt=>`<button class="option-btn" onclick="selectOption(this,'${opt.replace(/'/g,"\'")}')">　${opt}</button>`).join("");
+    // ⬇️ CORRECTION : pas d'apostrophe dans l'onclick, on passe l'index
+    g.innerHTML=q.options.map((opt,i)=>`<button class="option-btn" onclick="selectOptionByIndex(${i})">${opt}</button>`).join("");
   } else {
     document.getElementById("qcmOptions").style.display="none";
     document.getElementById("libreInput").style.display="block";
@@ -1359,10 +1360,14 @@ function renderQuestion(){
     setTimeout(()=>inp.focus(),100);
   }
 }
-function selectOption(btn,val){
+function selectOptionByIndex(index){
+  const q=gameState.questions[gameState.currentQuestionIndex];
+  const val=q.options[index];
   document.querySelectorAll(".option-btn").forEach(b=>b.classList.remove("selected"));
-  btn.classList.add("selected"); gameState.selectedOption=val;
+  document.querySelectorAll(".option-btn")[index].classList.add("selected");
+  gameState.selectedOption=val;
 }
+
 function validateAnswer(){
   const q=gameState.questions[gameState.currentQuestionIndex];
   let isCorrect=false; let userAnswer="";
@@ -1370,12 +1375,12 @@ function validateAnswer(){
     if(!gameState.selectedOption){showToast("Choisis une réponse !");return;}
     userAnswer=gameState.selectedOption;
     isCorrect=userAnswer===q.correct;
-    document.querySelectorAll(".option-btn").forEach(btn=>{
-      btn.disabled=true;
-      const v=btn.textContent.trim();
-      if(v===q.correct)btn.classList.add("correct");
-      else if(v===gameState.selectedOption&&!isCorrect)btn.classList.add("wrong");
-    });
+    document.querySelectorAll(".option-btn").forEach((btn,idx)=>{
+    btn.disabled=true;
+  const v=q.options[idx]; // ⬅️ on prend la valeur depuis le tableau, pas le DOM
+  if(v===q.correct)btn.classList.add("correct");
+  else if(v===gameState.selectedOption&&!isCorrect)btn.classList.add("wrong");
+});
   } else {
     const inp=document.getElementById("answerInput");
     userAnswer=inp.value.trim();
