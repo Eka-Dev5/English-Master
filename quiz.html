@@ -1098,9 +1098,11 @@ const QUESTIONS_DB = {
 // ÉTAT DU JEU
 // ═══════════════════════════════════════════════════════════════════
 let gameState = {
-  currentPlayer:null, currentLevel:1, currentMode:"mixte",
-  questions:[], currentQuestionIndex:0, score:0, answers:[], selectedOption:null
+  currentPlayer: null, currentLevel: 1, currentMode: "mixte",
+  questions: [], currentQuestionIndex: 0, score: 0, answers: [], selectedOption: null,
+  isAnswered: false  // ✅ À ajouter ici
 };
+   
 
 // ═══════════════════════════════════════════════════════════════════
 // GESTION JOUEURS
@@ -1333,7 +1335,8 @@ function shuffle(a){
   return arr;
 }
 function renderQuestion(){
-  const q=gameState.questions[gameState.currentQuestionIndex];
+  const q = gameState.questions[gameState.currentQuestionIndex];
+  gameState.isAnswered = false;  // verrouillage pour eviter double clic comptage
   const total=gameState.questions.length;
   const idx=gameState.currentQuestionIndex;
   document.getElementById("questionCounter").textContent="Q"+(idx+1)+"/"+total;
@@ -1370,7 +1373,11 @@ function selectOptionByIndex(index){
 
 function validateAnswer(){
   const q=gameState.questions[gameState.currentQuestionIndex];
-  let isCorrect=false; let userAnswer="";
+ //securiser comptes en bloquant double clic
+    if (gameState.isAnswered) return;
+    gameState.isAnswered = true;
+// fin securiser double clic pour eviter faux comptage 
+   let isCorrect=false; let userAnswer="";
   if(q.type==="qcm"){
     if(!gameState.selectedOption){showToast("Choisis une réponse !");return;}
     userAnswer=gameState.selectedOption;
@@ -1455,14 +1462,30 @@ function saveActiveSession(){
 }
 // Fin Sauvegarde session en cours
 
-function nextQuestion(){
-  if(gameState.currentQuestionIndex>=gameState.questions.length-1) showResults();
-  else{gameState.currentQuestionIndex++; renderQuestion();}
+//function nextQuestion(){
+  //if(gameState.currentQuestionIndex>=gameState.questions.length-1) showResults();
+  //else{gameState.currentQuestionIndex++; renderQuestion();}
+// }
+
+   function nextQuestion() {
+  if (gameState.currentQuestionIndex >= gameState.questions.length - 1) {
+    showResults();
+    return;
+  }
+  gameState.currentQuestionIndex++;
+  renderQuestion();
 }
+
+   
 function showResults(){
   const total=gameState.questions.length;
-  const correct=gameState.answers.filter(a=>a.isCorrect).length;
-  const pct=Math.round(correct/total*100);
+  //const correct=gameState.answers.filter(a=>a.isCorrect).length;
+  //const pct=Math.round(correct/total*100);
+   
+   // securiser le pourcebtage 
+   const correct = Math.min(gameState.answers.filter(a => a.isCorrect).length, total);
+   const pct = Math.round((correct / total) * 100);
+
   document.getElementById("resultPct").textContent=pct+"%";
   const msg=pct>=80?"🎉 Excellent ! Niveau suivant débloqué !":pct>=50?"👍 Pas mal ! Continue à t'entraîner.":"💪 Courage ! Relis la leçon et réessaie !";
   document.getElementById("resultMsg").textContent=msg+" ("+correct+"/"+total+" bonnes réponses)";
