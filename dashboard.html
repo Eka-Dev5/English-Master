@@ -412,22 +412,45 @@ function nextCameleon(){
 }
 
 
-function renderFiches(){
-  const p=currentPlayerData;
-  const errors=p&&p.errorHistory?p.errorHistory.slice(-20).reverse():[];
-  const c=document.getElementById("fichesContent");
-  if(errors.length===0){
-    c.innerHTML="<div class='cam-no-errors'>🎉 Aucune erreur enregistrée ! Continue comme ça !</div>";return;
+  /* ══════════════════════════════════════════════════════
+     📝 FICHES D'ERREURS (Version corrigée avec Compteur)
+     ══════════════════════════════════════════════════════ */
+  function renderFiches() {
+    const p      = currentPlayerData;
+    // On retire le .slice(-20) pour bien compter TOUTES les erreurs du joueur
+    const errors = p && p.errorHistory ? p.errorHistory : [];
+    const c      = document.getElementById("fichesContent");
+
+    if (!errors.length) {
+      c.innerHTML = "<div class='cam-no-errors'>🎉 Aucune erreur enregistrée ! Continue comme ça !</div>";
+      return;
+    }
+
+    /* --- LOGIQUE DE COMPTAGE (Style Duolingo) --- */
+    // On groupe par question pour ne pas polluer l'écran, mais on compte les fois
+    const stats = errors.reduce((acc, curr) => {
+      acc[curr.question] = acc[curr.question] || { ...curr, count: 0 };
+      acc[curr.question].count += 1;
+      return acc;
+    }, {});
+
+    // On transforme en tableau et on trie (les plus gros problèmes en haut)
+    const sorted = Object.values(stats).sort((a, b) => b.count - a.count);
+
+    /* --- RENDU HTML (Syntaxe & Style conservés) --- */
+    c.innerHTML = `<p style="color:#718096; margin-bottom:14px;">📝 ${sorted.length} notion(s) à réviser :</p>` +
+      sorted.map(e => `
+        <div class="fiche-card" style="${e.count > 1 ? 'border-left: 5px solid var(--error);' : ''}">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div class="fiche-q" style="margin-bottom:0">❓ ${e.question}</div>
+            ${e.count > 1 ? `<span style="background:var(--error); color:white; padding:2px 8px; border-radius:12px; font-size:0.75em; font-weight:bold;">Trompé ${e.count} fois</span>` : ''}
+          </div>
+          <div class="fiche-wrong">✗ Ta dernière réponse : ${e.userAnswer || "—"}</div>
+          <div class="fiche-correct">✓ Bonne réponse : ${e.correctAnswer}</div>
+          ${e.explanation ? `<div class="fiche-expl">💡 ${e.explanation}</div>` : ""}
+        </div>`
+      ).join("");
   }
-  const unique=[...new Map(errors.map(e=>[e.question,e])).values()];
-  c.innerHTML=`<p style="color:#718096;margin-bottom:14px">${unique.length} erreurs à réviser :</p>`+
-    unique.map(e=>`<div class="fiche-card">
-      <div class="fiche-q">❓ ${e.question}</div>
-      <div class="fiche-wrong">✗ Ta réponse : ${e.userAnswer||"—"}</div>
-      <div class="fiche-correct">✓ Bonne réponse : ${e.correctAnswer}</div>
-      ${e.explanation?`<div class="fiche-expl">💡 ${e.explanation}</div>`:""}
-    </div>`).join("");
-}
 
 document.addEventListener("DOMContentLoaded",()=>{loadPlayerList();});
 
