@@ -1,336 +1,462 @@
-# 📘 README DÉVELOPPEUR — English Master
+# 📘 README DÉVELOPPEUR — Suite *Master Quiz*
 
-> Architecture, bonnes pratiques et guide de modification du projet.
+> Documentation technique ultra-précise.
+> Valide pour : **English Master**, **Histoire Master**, **Géographie Master**, et tout futur **Subject Master**.
+> Dernière mise à jour : mai 2025.
 
 ---
 
 ## 🗂️ Architecture générale
 
-Le projet repose sur **3 fichiers HTML autonomes** qui communiquent uniquement via le `localStorage` du navigateur. Aucun serveur, aucune base de données, aucune dépendance externe.
+Chaque matière est un **dossier GitHub indépendant** contenant exactement 4 fichiers HTML autonomes.
+Aucun serveur, aucune base de données, aucune dépendance externe.
+Communication entre fichiers : **localStorage uniquement**.
 
 ```
 quiz.html          ← Point d'entrée principal (jeu)
 dashboard.html     ← Espace personnel joueur
-lexique.html       ← Vocabulaire interactif
+lexique.html       ← Vocabulaire / notions interactif
+index.html         ← Page d'accueil (landing page)
 ```
 
-Les 3 fichiers doivent **impérativement être dans le même dossier** pour que les liens internes fonctionnent.
+### Dépôts GitHub
+
+| Matière | URL |
+|---|---|
+| English Master | `https://eka-dev5.github.io/English-Master/` |
+| Histoire Master | `https://eka-dev5.github.io/Histoire/` |
+| Géographie Master | `https://eka-dev5.github.io/geographie/` |
 
 ---
 
-## 🔑 Clés localStorage partagées
+## 🔑 Clés localStorage — par matière
 
-| Clé | Contenu | Fichiers concernés |
+Chaque matière a ses propres clés. Elles ne doivent **jamais être partagées** entre deux matières.
+
+| Matière | `storageKey` | `playersKey` |
 |---|---|---|
-| `englishMaster_players` | Objet JSON de tous les joueurs | quiz.html + dashboard.html |
-| `englishMaster_v4` | (héritage — non utilisé en v5) | — |
+| English Master | `englishMaster_v4` | `englishMaster_players` |
+| Histoire Master | `histoireMaster_v1` | `histoireMaster_players` |
+| Géographie Master | `geoMaster_v1` | `geoMaster_players` |
 
-Structure d'un joueur dans `englishMaster_players` :
+> ⚠️ `storageKey` et `playersKey` **doivent être identiques** dans `quiz.html` et `dashboard.html` d'une même matière.
+
+### Structure d'un joueur dans le localStorage
+
 ```json
 {
   "Prénom": {
-    "name": "Prénom",
-    "currentLevel": 3,
-    "score": 120,
-    "completed": [1, 2],
+    "name"          : "Prénom",
+    "currentLevel"  : 3,
+    "score"         : 120,
+    "completed"     : [1, 2],
     "totalQuestions": 45,
-    "totalCorrect": 38,
-    "streak": 5,
-    "lastPlayed": "2025-04-22T10:30:00.000Z",
-    "errorHistory": [...],
-    "cameleonHelped": 2
+    "totalCorrect"  : 38,
+    "streak"        : 5,
+    "lastPlayed"    : "2025-04-22T10:30:00.000Z",
+    "errorHistory"  : [ ... ],
+    "sessionHistory": [ ... ],
+    "activeSession" : null
   }
 }
+```
+
+| Propriété | Type | Rôle |
+|---|---|---|
+| `currentLevel` | `int` | Niveau actuel débloqué |
+| `score` | `int` | Points cumulés |
+| `completed` | `int[]` | Niveaux terminés avec ≥ 80% |
+| `streak` | `int` | Série de bonnes réponses consécutives |
+| `errorHistory` | `obj[]` | 50 dernières erreurs (pour les fiches) |
+| `sessionHistory` | `obj[]` | 50 dernières sessions jouées |
+| `activeSession` | `obj\|null` | Session interrompue (reprise possible) |
+
+---
+
+## ⚙️ SUBJECT_CONFIG — bloc de personnalisation
+
+Dans `quiz.html`, **première chose à modifier** pour créer une nouvelle matière :
+
+```javascript
+const SUBJECT_CONFIG = {
+  name         : "Histoire Master",   // Nom affiché dans l'interface
+  emoji        : "🏛️",               // Emoji du cours
+  lang         : "fr",               // Langue (non utilisé fonctionnellement)
+  storageKey   : "histoireMaster_v1", // Clé unique localStorage
+  playersKey   : "histoireMaster_players", // Clé joueurs unique
+  dashboardFile: "dashboard.html",   // Nom du fichier dashboard
+  lexiqueFile  : "lexique.html"      // Nom du fichier lexique
+};
 ```
 
 ---
 
 ## 📄 quiz.html — Structure détaillée
 
-### HEAD
-
-```html
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-```
-Le viewport mobile-first est essentiel pour le rendu sur tablette/téléphone (usage CM2).
-
 ### CSS — Variables root
 
 ```css
 :root {
-  --primary: #667eea;
-  --secondary: #764ba2;
-  --success: #48bb78;
-  --error: #f56565;
-  --warning: #ed8936;
+  --primary  : #922B21;   /* Couleur principale — boutons, titres, barres */
+  --secondary: #c0392b;   /* Couleur secondaire — dégradés */
+  --success  : #48bb78;   /* Vert — bonne réponse */
+  --error    : #f56565;   /* Rouge — mauvaise réponse */
+  --warning  : #ed8936;   /* Orange — encadrés d'avertissement */
+  --bg       : #f7fafc;
+  --text     : #2d3748;
+  --shadow   : 0 10px 30px rgba(0,0,0,0.15);
 }
 ```
-**Bonne pratique appliquée :** toutes les couleurs passent par des variables CSS. Pour changer le thème complet du jeu, modifier ces 5 valeurs suffit. Aucune couleur codée en dur dans les règles de composants.
 
-### CSS — Layout
+> 💡 Pour recolorer toute l'interface : modifier uniquement `--primary` et `--secondary`.
 
-- `display: flex` avec `flex-wrap: wrap` sur tous les conteneurs de boutons → responsive automatique sans media query redondante.
-- `grid-template-columns: repeat(auto-fill, minmax(230px, 1fr))` sur la grille des niveaux → s'adapte de 1 à N colonnes selon la largeur disponible, sans breakpoints manuels.
-- `gap` systématique au lieu de `margin` → évite les collisions de marges et simplifie le spacing.
+### CSS — Classes pédagogiques (leçons)
 
-### CSS — Animations
+| Classe | Rendu | Usage |
+|---|---|---|
+| `.lesson-rule` | Fond blanc + trait gauche coloré | Bloc de règle avec `<h4>` |
+| `.lesson-table` | Tableau avec entête coloré | Tableau comparatif |
+| `.lesson-warning` | Fond jaune + trait orange | Erreur fréquente ⚠️ |
+| `.lesson-example` | Fond bleu lavande `#EEF2FF` + trait `#667eea` | Exemple 💡 |
 
-```css
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-```
-Utilisée sur l'affichage du feedback. Légère, CSS-only, sans librairie.
+> ⚠️ `.lesson-example` est délibérément **bleu** (pas vert) pour se distinguer visuellement du feedback "bonne réponse" (vert).
 
-### CSS — Media query
+### CSS — Responsive mobile
 
-```css
-@media (max-width: 600px) {
-  .player-selector { flex-direction: column; align-items: stretch; }
-  .player-selector select { width: 100%; }
-}
-```
-Seul point de rupture nécessaire : empile le sélecteur de joueur verticalement sur mobile.
+Deux `@media (max-width: 600px)` :
+1. Adapte l'intro de leçon (`#lessonIntro`, `#lessonIntroContent`)
+2. Fixe la largeur de la première colonne des tableaux (50px) + active `overflow-x: auto` sur `.lesson-table`
 
 ---
 
-### SUBJECT_CONFIG — Bloc de configuration sujet
+### Sections HTML (écrans du jeu)
+
+| `id` | Rôle | Affiché par |
+|---|---|---|
+| `accueil` | Stats joueur + export/import | Défaut, `showSection('accueil')` |
+| `lecons` | Liste des leçons dépliables | `showSection('lecons')` |
+| `niveaux` | Grille des niveaux + sélecteur de mode | `showSection('niveaux')` |
+| `jeu` | Question en cours + feedback | `startLevel(N)` |
+| `resultats` | Score final + boutons | `showResults()` |
+
+---
+
+### LESSONS_DATA — Structure
 
 ```javascript
-const SUBJECT_CONFIG = {
-  name: "English Master",
-  emoji: "🎓",
-  storageKey: "englishMaster_v4",
-  playersKey: "englishMaster_players",
-  dashboardFile: "dashboard.html",
-  lexiqueFile: "lexique.html"
+const LESSONS_DATA = [
+  {
+    num    : 1,
+    title  : "Titre de la leçon",
+    content: `
+      <div class="lesson-rule">
+        <h4>TITRE DE LA RÈGLE</h4>
+        <table class="lesson-table">...</table>
+      </div>
+      <div class="lesson-warning">⚠️ Attention : ...</div>
+      <div class="lesson-example">💡 Exemple : ...</div>
+    `
+  }
+];
+```
+
+- `num` est indicatif (affichage) — il correspond au numéro de niveau associé
+- `content` est du HTML libre : utiliser les classes `.lesson-rule`, `.lesson-table`, `.lesson-warning`, `.lesson-example`
+- La leçon s'affiche automatiquement dans `#lessonIntro` au début du niveau correspondant
+
+---
+
+### QUESTIONS_DB — Structure
+
+```javascript
+const QUESTIONS_DB = {
+  1: {
+    title    : "Titre Niveau 1 🎯",
+    objective: "Ce qu'on apprend dans ce niveau",
+    qcm: [
+      {
+        q          : "Question à choix multiple ?",
+        options    : ["Option A", "Option B", "Option C", "Option D"],
+        correct    : "Option A",
+        explanation: "Explication affichée dans le feedback."
+      }
+      // min 20 questions recommandées
+    ],
+    libre: [
+      {
+        q          : "Question à réponse libre ?",
+        answer     : "réponse exacte",
+        alternatives: ["variante acceptée", "autre variante"],  // optionnel
+        explanation: "Explication."
+      }
+      // min 20 questions recommandées
+    ]
+  },
+  2: { ... }
 };
-```
-**Point d'entrée principal pour adapter le jeu à une autre matière.** Modifier `name` et `playersKey` (clé unique pour ne pas mélanger les sauvegardes d'une matière à l'autre).
-
----
-
-### LESSONS_DATA — Structure d'une leçon
-
-```javascript
-{
-  num: 1,
-  title: "TO BE / TO HAVE (Être / Avoir)",
-  content: `<div class="lesson-rule">
-    <h4>Titre de la règle</h4>
-    <table class="lesson-table">...</table>
-  </div>
-  <div class="lesson-warning">⚠️ Attention : ...</div>
-  <div class="lesson-example">✅ Exemples ...</div>`
-}
-```
-
-Classes disponibles dans `content` :
-
-| Classe | Usage |
-|---|---|
-| `.lesson-rule` | Bloc de règle avec titre |
-| `.lesson-table` | Tableau comparatif |
-| `.lesson-warning` | Encadré avertissement (fond jaune) |
-| `.lesson-example` | Encadré exemple (fond vert) |
-
-**Pour ajouter une leçon :** ajouter un objet à la fin du tableau `LESSONS_DATA`. Le numéro `num` est indicatif (affichage), il n'est pas lié à un niveau de quiz.
-
----
-
-### QUESTIONS_DB — Structure d'un niveau
-
-```javascript
-5: {
-  title: "Retour en arrière ⏪",
-  objective: "Prétérit Was / Were",
-  qcm: [
-    {
-      q: "I ___ happy yesterday.",
-      options: ["was", "were", "am", "is"],
-      correct: "was",
-      explanation: "I + WAS (prétérit de BE)."
-    },
-    // ... 19 autres questions
-  ],
-  libre: [
-    {
-      q: "I (be) ___ happy yesterday.",
-      answer: "was",
-      alternatives: ["'s"],   // optionnel : réponses acceptées en plus
-      explanation: "I + WAS."
-    },
-    // ... 19 autres questions
-  ]
-}
 ```
 
 **Règles importantes :**
-- La clé numérique (`5:`) correspond au numéro de niveau (1 à 10).
-- `qcm` : 20 questions minimum recommandées. Le moteur en tire 5 aléatoirement en mode Mixte, 10 en mode QCM.
-- `libre` : même logique, 10 en mode Écrit, 5 en Mixte.
-- `alternatives` est optionnel. Si présent, les réponses listées sont acceptées en plus de `answer`.
-- La comparaison est insensible à la casse et ignore la ponctuation (`.`, `,`, `'`, `!`).
+- `qcm[]` : le moteur tire **5 questions** en mode Mixte, **10** en mode QCM pur
+- `libre[]` : **5 questions** en mode Mixte, **10** en mode Écrit pur
+- `alternatives` est optionnel — les variantes sont acceptées en plus de `answer`
+- La comparaison est **insensible à la casse** et **ignore la ponctuation** (`.`, `,`, `'`, `!`)
 
-**Pour ajouter des questions à un niveau existant :**
+**Changer le nombre de niveaux :**
+Modifier **3 endroits** dans `quiz.html` :
 ```javascript
-// Trouver le niveau dans QUESTIONS_DB, ex: niveau 3
-3: {
-  title: "...",
-  objective: "...",
-  qcm: [
-    // ... questions existantes ...
-    // Ajouter ici :
-    {q: "Nouvelle question ___.", options: ["A","B","C","D"], correct: "A", explanation: "Explication."}
-  ],
-  libre: [
-    // ... questions existantes ...
-    {q: "Nouvelle question (verbe) ___.", answer: "réponse", explanation: "Explication."}
-  ]
-}
-```
+// 1 — renderLevels()
+for (let i = 1; i <= 5; i++)   // ← changer 5
 
-**Pour créer un niveau 11 :**
-```javascript
-// Dans QUESTIONS_DB, après le niveau 10, ajouter :
-11: {
-  title: "Nouveau thème 🆕",
-  objective: "Description courte",
-  qcm: [ /* 20 questions */ ],
-  libre: [ /* 20 questions */ ]
-}
+// 2 — startNextLevel()
+if (nlvl <= 5) startLevel(nlvl)  // ← changer 5
+
+// 3 — DOMContentLoaded
+if (lvl >= 1 && lvl <= 5)  // ← changer 5
+
+// 4 — showResults() — optionnel selon la logique de déblocage
+if (gameState.currentLevel < 5) p.currentLevel = ...  // ← changer 5
 ```
-Puis dans `renderLevels()`, changer `i <= 10` en `i <= 11`.
 
 ---
 
-### Logique de jeu — Flux principal
+### gameState — Variables globales
+
+```javascript
+let gameState = {
+  currentPlayer       : null,    // Prénom du joueur actif
+  currentLevel        : 1,       // Niveau en cours
+  currentMode         : "mixte", // "mixte" | "qcm" | "libre"
+  questions           : [],      // Questions tirées pour la session
+  currentQuestionIndex: 0,       // Index de la question affichée
+  score               : 0,       // Score de la session en cours
+  answers             : [],      // Historique des réponses données
+  selectedOption      : null     // Option QCM sélectionnée non validée
+};
+```
+
+---
+
+### Flux principal du jeu
 
 ```
 startLevel(N)
-  → shuffle questions selon le mode
-  → showSection('jeu')
+  → showLessonIntro(N)    ← affiche la leçon avant les questions
+  → startQuestions()      ← joueur clique "C'est parti !"
   → renderQuestion()
-       → si qcm  : affiche boutons options
-       → si libre : affiche input texte
+       → QCM  : affiche boutons .option-btn
+       → Libre: affiche <input type="text">
   → validateAnswer()
-       → calcule isCorrect
-       → affiche feedback
-       → met à jour localStorage
-       → affiche bouton "Suivant"
-  → nextQuestion() ou showResults()
+       → calcule isCorrect (normalisation casse + ponctuation)
+       → affiche feedback .correct-fb / .wrong-fb
+       → trackError() si mauvaise réponse
+       → saveActiveSession() → localStorage
+       → affiche bouton "Suivant" ou "Voir les résultats"
+  → nextQuestion()   ← retour à renderQuestion() ou showResults()
+  → showResults()
+       → Math.min(correct, total) sécurise le %
+       → sauvegarde sessionHistory
+       → débloque niveau suivant si pct >= 80
+       → savePlayers() systématiquement
 ```
+
+---
+
+### Fonctions joueur
+
+| Fonction | Rôle |
+|---|---|
+| `getPlayers()` | Lit tous les joueurs depuis localStorage (try/catch) |
+| `savePlayers(p)` | Écrit tous les joueurs dans localStorage |
+| `getPlayerData(name)` | Retourne un joueur, le crée s'il n'existe pas |
+| `switchPlayer(name)` | Active un joueur, met à jour gameState + affichage |
+| `showNewPlayerModal()` | Ouvre la modale de création |
+| `confirmNewPlayer()` | Valide la création du joueur |
+| `deleteCurrentPlayer()` | Supprime le joueur actif après confirmation |
+| `updatePlayerDisplay()` | Recharge le `<select>` + les stats du header |
+
+---
+
+### Navigation URL (passage du joueur entre pages)
+
+```
+quiz.html → dashboard.html : goToDashboard()
+  → window.location.href = "dashboard.html?player=Prénom"
+
+dashboard.html → quiz.html : goToQuiz()
+  → window.location.href = "quiz.html?player=Prénom"
+
+dashboard.html → niveau direct : launchLevel(N)
+  → window.location.href = "quiz.html?level=N&player=Prénom"
+```
+
+Dans `DOMContentLoaded` de **quiz.html** : `params.get('player')` est lu **en priorité** avant le premier joueur de la liste.
+Dans `loadPlayerList()` de **dashboard.html** : même logique, le joueur URL prend le dessus.
 
 ---
 
 ## 📄 dashboard.html — Structure détaillée
 
-### Onglets
+### Variables de config (en haut du `<script>`)
 
-La navigation par onglets est gérée par `showTab(id, btn)` :
 ```javascript
-function showTab(id, btn) {
-  document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
-  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  if (btn) btn.classList.add("active");
+const STORAGE_KEY = "histoireMaster_v1";      // même que quiz.html
+const PLAYERS_KEY = "histoireMaster_players"; // même que quiz.html
+
+const LEVEL_NAMES = {
+  1: "Préhistoire & Antiquité 🦴",
+  2: "Moyen Âge ⚔️",
+  // ...
+};
+```
+
+### BADGES_DEF — Ajouter un badge
+
+```javascript
+{
+  id   : 31,
+  icon : "🦊",
+  name : "Nom du badge",
+  desc : "Condition affichée au joueur",
+  check: p => (p.score || 0) >= 3000
 }
 ```
-Simple, sans librairie. L'onglet actif est stylisé via `.tab-btn.active`.
 
-### Badges — Ajouter un badge
+Le paramètre `p` est l'objet joueur depuis localStorage.
+Propriétés utilisables : `p.score`, `p.completed`, `p.streak`, `p.totalQuestions`, `p.totalCorrect`, `p.cameleonHelped`, `p.errorHistory`, `p.sessionHistory`.
 
-```javascript
-// Dans BADGES_DEF, ajouter un objet :
-{
-  id: 31,
-  icon: "🦊",
-  name: "Nom du badge",
-  desc: "Condition affichée au joueur",
-  check: p => (p.score || 0) >= 3000   // logique de déverrouillage
-}
-```
-Le paramètre `p` est l'objet joueur depuis localStorage. Toutes les propriétés du joueur sont accessibles (`p.score`, `p.completed`, `p.streak`, `p.totalQuestions`, `p.cameleonHelped`, etc.).
-
-### Mode Caméléon — Ajouter des exercices
+### CAMELEON_EXERCISES — Ajouter un exercice
 
 ```javascript
-// Dans CAMELEON_EXERCISES, ajouter :
 {
-  error: "Phrase avec l'erreur de Lucas.",
-  correct: "Phrase correcte.",
-  rule: "Explication de la règle à retenir.",
+  error  : "Phrase incorrecte de Lucas.",
+  correct: "La phrase correcte.",        // ← doit correspondre exactement à une option
+  rule   : "Explication de la règle.",
   options: [
-    "Option 1 (fausse)",
-    "Option 2 (correcte)",
-    "Option 3 (fausse)",
-    "Option 4 (fausse)"
+    "La phrase correcte.",    // ← même texte que correct
+    "Option fausse 1",
+    "Option fausse 2",
+    "Option fausse 3"
   ]
 }
 ```
-L'option correcte doit correspondre exactement à la valeur de `correct`.
+
+> ⚠️ La valeur de `correct` doit être **exactement identique** (caractère pour caractère) à l'une des `options`.
+> La correction des apostrophes est gérée en JS via `currentCamOptions[]` — pas d'attribut `onclick` avec du texte brut.
+
+### Onglets dashboard
+
+```javascript
+function showTab(id, btn) {
+  // Recharge les données fraîches depuis localStorage avant d'afficher
+  // Appelle renderCameleon() si id === "cameleon"
+  // Appelle renderFiches()   si id === "fiches"
+}
+```
 
 ---
 
 ## 📄 lexique.html — Structure détaillée
 
-### Ajouter des mots
+### Structure d'un mot
 
 ```javascript
-// Dans le tableau LEXIQUE, ajouter :
-{
-  en: "mot en anglais",
-  fr: "traduction française",
-  def: "Définition courte et claire.",
-  ex: "Exemple d'utilisation dans une phrase.",
-  level: 3,        // niveau auquel ce mot appartient (1-10)
-  cat: "verbe"     // catégorie : verbe, nom, adjectif, adverbe, modal, expression, conjonction, préposition
-}
+const LEXIQUE = [
+  {
+    main : "Terme principal",       // mot, date, notion, événement...
+    trans: "Traduction / def courte",
+    def  : "Définition complète.",
+    ex   : "Exemple dans une phrase.",
+    level: 3,                        // numéro de niveau (1 à N)
+    cat  : "catégorie"               // verbe, date, événement, relief...
+  }
+];
+```
+
+### Paramètres URL acceptés
+
+- `lexique.html?level=3` → filtre automatiquement sur le niveau 3 au chargement
+- `lexique.html#montblanc` → pré-remplit la barre de recherche avec "montblanc"
+- Ces deux paramètres sont **combinables**
+
+---
+
+## 🔄 Créer une nouvelle matière (procédure complète)
+
+1. Créer un nouveau dépôt GitHub (ex : `Sciences-Master`)
+2. Copier les 4 fichiers du dossier `template/`
+3. **Dans `quiz-template.html`** — modifier `SUBJECT_CONFIG` :
+   ```javascript
+   name         : "Sciences Master",
+   emoji        : "🔬",
+   storageKey   : "sciencesMaster_v1",    // clé UNIQUE
+   playersKey   : "sciencesMaster_players" // clé UNIQUE
+   ```
+4. Remplacer `LESSONS_DATA` par les leçons de la nouvelle matière
+5. Remplacer `QUESTIONS_DB` par les questions (même structure JSON)
+6. Mettre à jour les compteurs de niveaux dans le JS (3 endroits — voir section QUESTIONS_DB)
+7. Adapter les couleurs CSS (`--primary` et `--secondary`)
+8. **Dans `dashboard-template.html`** — mettre les mêmes `STORAGE_KEY` et `PLAYERS_KEY`
+9. Remplir `LEVEL_NAMES`, `BADGES_DEF` (noms à adapter), `CAMELEON_EXERCISES`
+10. **Dans `lexique-template.html`** — remplacer `LEXIQUE[]` par le vocabulaire de la matière
+11. **Dans `index-template.html`** — adapter titre, slogan, pills de stats, couleurs
+
+---
+
+## 🐛 Bugs connus et correctifs appliqués
+
+### Bug tirets longs (Safari / iPhone)
+**Symptôme :** Boutons gris, interface sans couleur.
+**Cause :** L'iPhone substitue `--` par `–` (tiret long typographique) lors du copier-coller depuis Word ou certaines apps. Safari refuse `var(–primary)`.
+**Correctif :** Toujours vérifier avec `grep "var(–" fichier.html` avant mise en ligne. Remplacer `–` par `--`.
+
+### Bug DOMContentLoaded dupliqué
+**Symptôme :** Le jeu se charge mais le joueur n'est pas retrouvé / sauvegarde perdue.
+**Cause :** Code dupliqué après la fermeture `});` du `DOMContentLoaded`.
+**Correctif :** Un seul `document.addEventListener("DOMContentLoaded", ...)` dans le fichier. Vérifier avec `grep -c "DOMContentLoaded" fichier.html` → doit retourner `1`.
+
+### Bug backticks Markdown dans le HTML
+**Symptôme :** Texte affiché brut avec des \`\`\` dans l'intro de leçon.
+**Cause :** Artefact de copier-coller depuis un éditeur Markdown.
+**Correctif :** Supprimer tous les blocs \`\`\`...\`\`\` parasites du HTML. Vérifier avec `grep -c '\`\`\`' fichier.html` → doit retourner `0`.
+
+### Bug showResults — pourcentage > 100%
+**Symptôme :** Score affiché à 110% ou plus.
+**Cause :** `answers[]` pouvait contenir plus d'entrées que de questions.
+**Correctif appliqué :**
+```javascript
+const correct = Math.min(gameState.answers.filter(a => a.isCorrect).length, total);
+const pct     = Math.round((correct / total) * 100);
+```
+
+### Bug apostrophes Caméléon (bouton "Suivant" inactif)
+**Symptôme :** Cliquer sur une option du Caméléon ne fait rien.
+**Cause :** Les apostrophes dans les textes des options cassaient l'attribut `onclick="checkCameleon('texte avec apostrophe')"`.
+**Correctif appliqué :** Stockage des options dans `currentCamOptions[]` et passage par index entier :
+```javascript
+// Rendu
+options.map((opt, i) => `<button onclick="checkCameleon(${i})">${opt}</button>`)
+// Validation
+function checkCameleon(idx) { const chosen = currentCamOptions[idx]; ... }
 ```
 
 ---
 
-## 🔄 Adapter à une autre matière
-
-**Exemple : Maths Master**
-
-1. Dupliquer les 3 fichiers, renommer `quiz.html` → `maths-quiz.html`, etc.
-2. Dans `quiz.html`, modifier `SUBJECT_CONFIG` :
-```javascript
-const SUBJECT_CONFIG = {
-  name: "Maths Master",
-  emoji: "🔢",
-  playersKey: "mathsMaster_players",   // clé différente = sauvegardes séparées
-  dashboardFile: "maths-dashboard.html",
-  lexiqueFile: "maths-lexique.html"
-};
-```
-3. Remplacer `LESSONS_DATA` par les leçons de maths.
-4. Remplacer `QUESTIONS_DB` par les questions de maths (même structure JSON).
-5. Dans `lexique.html`, remplacer le tableau `LEXIQUE` par le vocabulaire mathématique.
-6. Dans `dashboard.html`, remplacer `CAMELEON_EXERCISES` par des erreurs typiques en maths.
-
-La clé `playersKey` différente garantit que les progressions ne se mélangent pas entre les matières.
-
----
-
-## ✅ Bonnes pratiques appliquées — Récapitulatif
+## ✅ Bonnes pratiques — Récapitulatif
 
 | Pratique | Détail |
 |---|---|
-| Variables CSS (`--primary`, etc.) | Thème modifiable en 5 lignes |
+| Variables CSS `--primary` | Recolorer toute l'interface en 2 lignes |
 | `flex-wrap: wrap` systématique | Responsive sans media queries multiples |
 | `grid auto-fill minmax` | Grille fluide sans breakpoints |
-| Fonctions courtes et nommées | Lisibilité et maintenance facilitées |
-| `localStorage` structuré | Sauvegarde robuste, exportable |
-| Comparaison de réponse normalisée | Insensible à casse et ponctuation |
+| localStorage structuré | Sauvegarde exportable/importable JSON |
+| Comparaison normalisée (casse + ponctuation) | Réponses libres tolérantes |
 | Zéro dépendance externe | Fonctionne offline, sans CDN |
-| HTML sémantique | `<button>`, `<input>`, `<select>` natifs |
-| Animations CSS-only | Légères, sans JS ni librairie |
-| Config sujet isolée | Duplication rapide pour autre matière |
+| Joueur passé dans l'URL (`?player=`) | Passage transparent quiz ↔ dashboard |
+| `Math.min(correct, total)` | Sécurise le calcul du pourcentage |
+| `currentCamOptions[]` | Évite les bugs d'apostrophes dans le Caméléon |
+| Un seul `DOMContentLoaded` | Évite les doubles initialisations |
 
 ---
 
-*Projet English Master — Architecture locale, 3 fichiers, 0 dépendance.*
+*Suite Master Quiz — Architecture locale, 4 fichiers, 0 dépendance.*

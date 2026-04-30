@@ -1098,11 +1098,9 @@ const QUESTIONS_DB = {
 // ÉTAT DU JEU
 // ═══════════════════════════════════════════════════════════════════
 let gameState = {
-  currentPlayer: null, currentLevel: 1, currentMode: "mixte",
-  questions: [], currentQuestionIndex: 0, score: 0, answers: [], selectedOption: null,
-  isAnswered: false  // ✅ À ajouter ici
+  currentPlayer:null, currentLevel:1, currentMode:"mixte",
+  questions:[], currentQuestionIndex:0, score:0, answers:[], selectedOption:null
 };
-   
 
 // ═══════════════════════════════════════════════════════════════════
 // GESTION JOUEURS
@@ -1335,8 +1333,7 @@ function shuffle(a){
   return arr;
 }
 function renderQuestion(){
-  const q = gameState.questions[gameState.currentQuestionIndex];
-  gameState.isAnswered = false;  // verrouillage pour eviter double clic comptage
+  const q=gameState.questions[gameState.currentQuestionIndex];
   const total=gameState.questions.length;
   const idx=gameState.currentQuestionIndex;
   document.getElementById("questionCounter").textContent="Q"+(idx+1)+"/"+total;
@@ -1353,8 +1350,7 @@ function renderQuestion(){
     document.getElementById("qcmOptions").style.display="grid";
     document.getElementById("libreInput").style.display="none";
     const g=document.getElementById("qcmOptions");
-    // ⬇️ CORRECTION : pas d'apostrophe dans l'onclick, on passe l'index
-    g.innerHTML=q.options.map((opt,i)=>`<button class="option-btn" onclick="selectOptionByIndex(${i})">${opt}</button>`).join("");
+    g.innerHTML=q.options.map(opt=>`<button class="option-btn" onclick="selectOption(this,'${opt.replace(/'/g,"\'")}')">　${opt}</button>`).join("");
   } else {
     document.getElementById("qcmOptions").style.display="none";
     document.getElementById("libreInput").style.display="block";
@@ -1363,31 +1359,23 @@ function renderQuestion(){
     setTimeout(()=>inp.focus(),100);
   }
 }
-function selectOptionByIndex(index){
-  const q=gameState.questions[gameState.currentQuestionIndex];
-  const val=q.options[index];
+function selectOption(btn,val){
   document.querySelectorAll(".option-btn").forEach(b=>b.classList.remove("selected"));
-  document.querySelectorAll(".option-btn")[index].classList.add("selected");
-  gameState.selectedOption=val;
+  btn.classList.add("selected"); gameState.selectedOption=val;
 }
-
 function validateAnswer(){
   const q=gameState.questions[gameState.currentQuestionIndex];
- //securiser comptes en bloquant double clic
-    if (gameState.isAnswered) return;
-    gameState.isAnswered = true;
-// fin securiser double clic pour eviter faux comptage 
-   let isCorrect=false; let userAnswer="";
+  let isCorrect=false; let userAnswer="";
   if(q.type==="qcm"){
     if(!gameState.selectedOption){showToast("Choisis une réponse !");return;}
     userAnswer=gameState.selectedOption;
     isCorrect=userAnswer===q.correct;
-    document.querySelectorAll(".option-btn").forEach((btn,idx)=>{
-    btn.disabled=true;
-  const v=q.options[idx]; // ⬅️ on prend la valeur depuis le tableau, pas le DOM
-  if(v===q.correct)btn.classList.add("correct");
-  else if(v===gameState.selectedOption&&!isCorrect)btn.classList.add("wrong");
-});
+    document.querySelectorAll(".option-btn").forEach(btn=>{
+      btn.disabled=true;
+      const v=btn.textContent.trim();
+      if(v===q.correct)btn.classList.add("correct");
+      else if(v===gameState.selectedOption&&!isCorrect)btn.classList.add("wrong");
+    });
   } else {
     const inp=document.getElementById("answerInput");
     userAnswer=inp.value.trim();
@@ -1462,30 +1450,14 @@ function saveActiveSession(){
 }
 // Fin Sauvegarde session en cours
 
-//function nextQuestion(){
-  //if(gameState.currentQuestionIndex>=gameState.questions.length-1) showResults();
-  //else{gameState.currentQuestionIndex++; renderQuestion();}
-// }
-
-   function nextQuestion() {
-  if (gameState.currentQuestionIndex >= gameState.questions.length - 1) {
-    showResults();
-    return;
-  }
-  gameState.currentQuestionIndex++;
-  renderQuestion();
+function nextQuestion(){
+  if(gameState.currentQuestionIndex>=gameState.questions.length-1) showResults();
+  else{gameState.currentQuestionIndex++; renderQuestion();}
 }
-
-   
 function showResults(){
   const total=gameState.questions.length;
-  //const correct=gameState.answers.filter(a=>a.isCorrect).length;
-  //const pct=Math.round(correct/total*100);
-   
-   // securiser le pourcebtage 
-   const correct = Math.min(gameState.answers.filter(a => a.isCorrect).length, total);
-   const pct = Math.round((correct / total) * 100);
-
+  const correct=gameState.answers.filter(a=>a.isCorrect).length;
+  const pct=Math.round(correct/total*100);
   document.getElementById("resultPct").textContent=pct+"%";
   const msg=pct>=80?"🎉 Excellent ! Niveau suivant débloqué !":pct>=50?"👍 Pas mal ! Continue à t'entraîner.":"💪 Courage ! Relis la leçon et réessaie !";
   document.getElementById("resultMsg").textContent=msg+" ("+correct+"/"+total+" bonnes réponses)";
