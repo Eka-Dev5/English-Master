@@ -412,12 +412,11 @@ function nextCameleon(){
 }
 
 
-  /* ══════════════════════════════════════════════════════
-     📝 FICHES D'ERREURS (Version corrigée avec Compteur)
+    /* ══════════════════════════════════════════════════════
+     📝 FICHES D'ERREURS (Version Duolingo — Compteur actif)
      ══════════════════════════════════════════════════════ */
   function renderFiches() {
     const p      = currentPlayerData;
-    // On retire le .slice(-20) pour bien compter TOUTES les erreurs du joueur
     const errors = p && p.errorHistory ? p.errorHistory : [];
     const c      = document.getElementById("fichesContent");
 
@@ -426,18 +425,18 @@ function nextCameleon(){
       return;
     }
 
-    /* --- LOGIQUE DE COMPTAGE (Style Duolingo) --- */
-    // On groupe par question pour ne pas polluer l'écran, mais on compte les fois
+    /* --- LOGIQUE DE COMPTAGE --- */
+    // On groupe par question pour compter les répétitions
     const stats = errors.reduce((acc, curr) => {
       acc[curr.question] = acc[curr.question] || { ...curr, count: 0 };
       acc[curr.question].count += 1;
       return acc;
     }, {});
 
-    // On transforme en tableau et on trie (les plus gros problèmes en haut)
+    // On trie : les erreurs les plus fréquentes apparaissent en premier
     const sorted = Object.values(stats).sort((a, b) => b.count - a.count);
 
-    /* --- RENDU HTML (Syntaxe & Style conservés) --- */
+    /* --- RENDU HTML (Style & Classes conservés) --- */
     c.innerHTML = `<p style="color:#718096; margin-bottom:14px;">📝 ${sorted.length} notion(s) à réviser :</p>` +
       sorted.map(e => `
         <div class="fiche-card" style="${e.count > 1 ? 'border-left: 5px solid var(--error);' : ''}">
@@ -451,6 +450,7 @@ function nextCameleon(){
         </div>`
       ).join("");
   }
+
 
 document.addEventListener("DOMContentLoaded",()=>{loadPlayerList();});
 
