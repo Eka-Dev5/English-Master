@@ -1423,15 +1423,31 @@ document.getElementById("feedbackExplanation").innerHTML=(q.explanation||"")+`<b
 
 }
 
-function trackError(question,userAnswer){
-  if(!gameState.currentPlayer)return;
-  const players=getPlayers();
-  const p=players[gameState.currentPlayer];
-  if(!p.errorHistory)p.errorHistory=[];
-  p.errorHistory.push({question:question.q,userAnswer,correctAnswer:question.correct||question.answer,explanation:question.explanation,date:new Date().toISOString(),level:gameState.currentLevel});
-  if(p.errorHistory.length>50)p.errorHistory=p.errorHistory.slice(-50);
+  /* ══════════════════════════════════════════════════════
+     💾 ENREGISTREMENT DE L'ERREUR (Source des Fiches)
+     ══════════════════════════════════════════════════════ */
+function trackError(question, userAnswer) {
+  if (!gameState.currentPlayer) return;
+  const players = getPlayers();
+  const p = players[gameState.currentPlayer];
+  if (!p.errorHistory) p.errorHistory = [];
+
+  p.errorHistory.push({
+    question     : question.q,
+    userAnswer   : userAnswer,
+    // On pioche la bonne réponse et l'explication (expl)
+    correctAnswer: question.a || question.correct || question.answer,
+    explanation  : question.expl || question.explanation || "", 
+    date         : new Date().toISOString(),
+    level        : gameState.currentLevel
+  });
+
+  // On garde les 50 dernières erreurs pour la performance
+  if (p.errorHistory.length > 50) p.errorHistory = p.errorHistory.slice(-50);
+  
   savePlayers(players);
 }
+
   // Sauvegarde session en cours
 
 function saveActiveSession(){
